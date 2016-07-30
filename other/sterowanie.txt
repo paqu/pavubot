@@ -1,0 +1,20 @@
+MOTOR
+------------------------------------------------------------
+motora_speed -- predkosc silnika a DDAL_MOTOR_A_SPEED 0-100
+motorb_speed -- predkosc silnika b DDAL_MOTOR_B_SPEED 0-100
+motora_mode -- 
+motorb_mode -- [cw,ccw,stop]
+standby -- [0,1] 
+
+EKONDER
+------------------------------------------------------------
+distance_a -- 
+distance_b -- 
+reset -- [0,1]
+------------------------------------------------------------
+SERWOMECHANIZM
+angle -- 
+
+akcelometr -- 
+(filt Kalmana)jj
+zyroskop  --`

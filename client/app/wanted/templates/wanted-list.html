@@ -1,0 +1,38 @@
+<div class="container">
+  <div class="row">
+    <div class="col-lg-5">
+      <div class="input-group">
+        <span class="input-group-addon">Filtruj po imieniu:</span>
+        <input type="text" class="form-control" ng-model="search.firstname" placeholder="Wprowadz imię ...">
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="input-group">
+        <span class="input-group-addon">Filtruj po nazwisku:</span>
+        <input type="text" class="form-control" ng-model="search.surname" placeholder="Wprowadz nazwisko ...">
+      </div>
+    </div>
+    <div class="col-lg-2">
+      <a class="btn btn-info" ui-sref="newWanted"> Dodaj poszukiwanego </a>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-sm-6 col-md-4" ng-show="wanted.length < 1">Lista osób poszukiwanych jest pusta</div>
+    <div class="col-sm-6 col-md-4" ng-repeat="w  in wanted | filter:{'surname':search.surname} | filter:{'firstname':search.firstname}">
+      <div class="thumbnail">
+        <img src="http://placehold.it/300x200">
+        <div class="caption">
+          <h3>{{w.firstname}} {{w.surname}}</h3>
+          <p> Ostanio widziany: {{w.time}}</p>
+          <p> Miejsce: {{w.location_}}</p>
+          <p>
+            <a href="" class="btn btn-primary" role="button">Widziałem</a>
+            <a ui-sref="viewWanted({id: w._id})" class="btn btn-default" role="button">Szczegóły</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

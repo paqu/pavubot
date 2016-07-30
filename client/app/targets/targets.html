@@ -1,0 +1,31 @@
+<div class="container">
+  <div class="row">
+    <div class="table-responsive">
+      <div ng-show="robots.length" class="ng-hide">
+        <table class="table table-bordered">
+          <thead>
+            <th> Id:</th>
+            <th> Nazwa:</th>
+            <th> Control SocketId </th>
+            <th> Video SocketId </th>
+            <th>  </th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="robot in robots">
+              <td> {{robot._id}} </td>
+              <td> {{robot.name}} </td>
+              <td> {{robot.control_socketId}} </td>
+              <td> {{robot.video_socketId}} </td>
+              <td>
+                <a class="btn btn-info" ui-sref="target-admin({id:robot._id})"> Steruj </a>
+                <a class="btn btn-warning" ui-sref="target-watcher({id:robot._id})"> Obserwuj </a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div ng-show="!robots.length" class="ng-hide">
+        <p> Brak zarejestrowanych robotów </p>
+      </div>
+    </div>
+  </div>
+</div>

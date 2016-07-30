@@ -1,0 +1,29 @@
+.menu {
+	border-radius:0px;
+}
+div.rightToLeft > div {
+	display:block;
+	float:right;
+}
+.config-header {
+	text-align:center;
+	font-size:15px;
+	font-weight:bold;
+}
+.h-321 {
+	height:281px;
+}
+.video-contener {
+	display:block;
+	margin:0 auto;
+}
+.btn-video {
+	position:relative;
+	bottom:22px;
+	opacity:0.2;
+	width:200px;
+	margin:0 auto;
+}
+.btn-video:hover {
+	opacity:1;
+}
