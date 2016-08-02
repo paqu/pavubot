@@ -18,7 +18,7 @@ angular.module('inzApp')
         });
 
         Socket.on('user:update_video_socketId', function (data) {
-            console.log("[on] user:update_video_socketId");
+            console.log("[on] user:update_video_socketId" + data.video_socketId);
 
             for (var index = 0; index < $scope.robots.length; index++)
                if ($scope.robots[index]._id ==  data.id)
@@ -47,16 +47,21 @@ angular.module('inzApp')
         });
 }])
 
-    .controller('RobotCtrl',['$scope','$state', '$http', 'Socket', '$stateParams', function ($scope,$state, $http, Socket, $stateParams) {
+    .controller('RobotCtrl',['$scope','$state', '$http','$document', 'Socket', '$stateParams', function ($scope, $state, $http, $document, Socket, $stateParams) {
         $scope.robot = {};
         
         $scope.state = 'stop';
+        $scope.distance_sensor = 'sonar';
+        $scope.video = 'hidden';
+
 
         $scope.stop_video = function () {
             if ($scope.state === 'start') {
                 console.log(new Date() + ":stop video transmision");
                 $scope.state = 'stop';
-                //Socket.emit('server:stop_video');
+                console.log("[emit]:server_user_nsp:stop_video:" + $scope.robot.video_socketId);
+                Socket.emit("server_user_nsp:stop_video",{video_chanel:$scope.robot.video_socketId});
+                $scope.video_frame = "";
             }
 
         }
@@ -65,7 +70,8 @@ angular.module('inzApp')
             if ($scope.state === 'stop') {
                 console.log(new Date() + "start video transmision");
                 $scope.state = 'start';
-                //Socket.emit('server:start_video');
+                console.log("[emit]:server_user_nsp:start_video:" + $scope.robot.video_socketId);
+                Socket.emit("server_user_nsp:start_video",{video_chanel:$scope.robot.video_socketId});
             }
         }
 
@@ -84,10 +90,10 @@ angular.module('inzApp')
                 $scope.error = false;
                 console.log("[emit] server_user_nsp:update_speed, " + $scope.robot.control_socketId);
                 Socket.emit("server_user_nsp:update_speed", {
-                    motor_a_speed = $scope.robot.motor.motor_a_speed,
-                    motor_b_speed = $scope.robot.motor.motor_b_speed,
-                    robotId = $scope.robot.control_socketId;
-                }
+                    motor_a_speed : $scope.robot.motor.motor_a_speed,
+                    motor_b_speed : $scope.robot.motor.motor_b_speed,
+                    robotId : $scope.robot.control_socketId
+                });
             }
         }
 
@@ -97,42 +103,52 @@ angular.module('inzApp')
         });
 
 
-        Socket.on('connect', function () {
+        Socket.on("connect", function () {
             console.log("conneted to server from user interface");
-            console.log("[emit] server_user_nsp:join_to_robot_chanel:" + $scope.robot.control_socketId});
-            Socket.emit("server:join_to_robot_chanel",{chanel:$scope.robot.control_socketId});
+            console.log("[emit] server_user_nsp:join_to_robot_chanel:" + $scope.robot.control_socketId);
+            Socket.emit("server_user_nsp:join_to_robot_chanel",{chanel:$scope.robot.control_socketId}); //$scope.robot.control_socketId});
         });
 
-        Socket.on('user_robot:update_video_socketId', function (data) {
+        Socket.on("user_robot:update_video_socketId", function (data) {
             console.log("[on] user_robot:update_video_socketId to " + data.video_socketId);
             $scope.robot.video_socketId = data.video_socketId;
         });
 
-        Socket.on('user_robot:update_encoder_distance_a',function (data){
+        Socket.on("user_robot:update_encoder_distance_a",function (data){
             console.log('[on] user_robot:update_encoder_distance_a' + JSON.stringify(data));
             $scope.robot.encoder.distance_a = data.encoder_distance_a;
         });
 
-        Socket.on('user_robot:update_encoder_distance_b',function (data){
+        Socket.on("user_robot:update_encoder_distance_b",function (data){
             console.log('[on] user_robot:update_encoder_distance_b' + JSON.stringify(data));
             $scope.robot.encoder.distance_b = data.encoder_distance_b;
         });
 
-        Socket.on('user_robot:update_distance_sensor_sonar',function (data){
+        Socket.on("user_robot:update_distance_sensor_sonar",function (data){
             console.log('[on] user_robot:update_distance_sensor_sonar' + JSON.stringify(data));
             $scope.robot.distance_sensor.sonar = data.distance_sensor_sonar;
         });
 
-        Socket.on('user_robot:update_distance_sensor_infrared',function (data){
+        Socket.on("user_robot:update_distance_sensor_infrared",function (data){
             console.log('[on] user_robot:update_distance_sensor_infrared' + JSON.stringify(data));
             $scope.robot.distance_sensor.infrared = data.distance_sensor_infrared;
         });
 
-        Socket.on('user_robot:remove_robot', function () {
+        Socket.on("user_robot:remove_robot", function () {
             console.log("[on] user_rebot:remove_robot");
             alert('robot ' + $scope.robot.name + ' rozłączył się.');
             $state.go('robots');
         });
+        
+        Socket.on("user_robot:frame", function (data) {
+            console.log("[on]:user_robot:frame");
+            var uint8Arr = new Uint8Array(data.frame);
+            var str = String.fromCharCode.apply(null, uint8Arr);
+            var base64String = btoa(str);
+            $scope.video_frame = 'data:image/png;base64,' + base64String;
+
+        });
+
 
         $scope.$on('$destroy', function () {
             console.log("[on] $destroy");

@@ -51,7 +51,8 @@ var init_data = {
         sonar:String,
         infrared:String
     },
-    video_socketId:String
+    video_socketId:String,
+    watchers:Number
 }
 
 var SEND = 10;
@@ -171,10 +172,25 @@ conn.on('error', function (err) {
     logger("Error: " + err);
 });
 
+conn.on("robot:update_speed", function(data) {
+    logger("[on] robot:update_speed");
+    writeToFile(paths["motor_a_speed"], data.motor_a_speed);
+    writeToFile(paths["motor_b_speed"], data.motor_b_speed);
+});
+
+
+function writeToFile(path, value) {
+    fs.writeFile(path, value, (err) => {
+          if (err) throw err;
+          logger('Write  (' + value +') to ' + path);
+    });
+}
+
 function checkIfComplete(data) {
         count++;
         if (SEND == count) {
             data.video_socketId = 'no connection';
+            data.watchers = 0;
             logger("Send init data:\n" + JSON.stringify(data));
             conn.emit('server:init',data);
             count = 0;

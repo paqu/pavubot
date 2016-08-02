@@ -1,6 +1,7 @@
 var io = require('socket.io-client');
 var fs = require('fs')
 var commandLineArgs = require('command-line-args');
+var cv = require('opencv');
 var logger = require('../lib/logger');
 
 var options = commandLineArgs([
@@ -20,6 +21,12 @@ if (!HOST)
 var url = 'http://'+ HOST + ':' + PORT+'/video';
 
 var conn = io('http://localhost:1234/video');
+var interval;
+var camWidth = 320;
+var camHeight = 240;
+var camFps = 10;
+var camInterval = 1000 / camFps;
+var camera = new cv.VideoCapture(0);
 
 
 conn.on('connect', function (data) {
@@ -64,6 +71,23 @@ conn.on('error', function (err) {
 conn.on('video:video_socketId', function (data) {
     logger('get socket id:'+ data.socketId + ' from server.');
     writeToFile('dev/ddal/socket/video_socketId', data.socketId);
+});
+
+
+conn.on("video:stop_video", function () {
+    logger("[on] video:stop_video");
+    clearInterval(interval);
+});
+
+conn.on("video:start_video",function () {
+    logger("[on] video:start_video");
+    interval = setInterval(function () {
+        camera.read(function(err, im) {
+            if (err) throw err;
+            logger("[emit]:server_video_nsp:frame");
+            conn.emit("server_video_nsp:frame",{ frame: im.toBuffer() });
+        });
+    },camInterval);
 });
 
 

@@ -159,7 +159,7 @@ function controlConnection (socket) {
         robots[robots.indexOf(robot)].distance_sensor.sonar = data.distance_sensor_sonar;
         logger("Control:[emit] user_robot:update_distance_sensor_sonar: " + JSON.stringify(data));
         user_nsp.in(socket.id).emit('user_robot:update_distance_sensor_sonar'
-                ,{update_distance_sensor_sonar:data.distance_sensor_sonar});
+                ,{distance_sensor_sonar:data.distance_sensor_sonar});
     });
 
     socket.on('server:update_distance_sensor_infrared',function (data){
@@ -167,11 +167,11 @@ function controlConnection (socket) {
         robots[robots.indexOf(robot)].distance_sensor.infrared = data.distance_sensor_infrared;
         logger("Control:[emit] user_robot:update_distance_sensor_infrared: " + JSON.stringify(data));
         user_nsp.in(socket.id).emit('user_robot:update_distance_sensor_infrared'
-                ,{update_distance_sensor_infrared:data.distance_sensor_infrared});
+                ,{distance_sensor_infrared:data.distance_sensor_infrared});
     });
 
     socket.on('disconnect', function() {
-        logger("Control:disconnet from : " + addressIP + 'socketId:' + socket.id);
+        logger("Control:disconnet from : " + addressIP + ' socketId:' + socket.id);
         user_nsp.emit('user:remove_robot', {id:robot._id});
         robots.splice(robots.indexOf(robot),1);
         user_nsp.in(socket.id).emit('user_robot:remove_robot');
@@ -187,6 +187,12 @@ function videoConnection(socket) {
     logger("Send socket id " + socket.id + " to " + addressIP);
     socket.emit('video:video_socketId', { socketId:socket.id});
 
+    socket.on("server_video_nsp:frame", function (data) {
+        logger("[on]:server_video_nsp:frame");
+        logger("[emit]:user_robot:frame");
+        user_nsp.in(socket.id).emit("user_robot:frame",{frame: data.frame});
+    });
+
     socket.on('disconnect', function() {
         logger(" Disconnet: " + addressIP + " socket id: " + socket.id); 
         for (var index = 0; index < robots.length; index++) {
@@ -197,6 +203,7 @@ function videoConnection(socket) {
 
         if (robots[index] !== undefined) {
             robots[index].video_socketId = 'no connection';
+            robots[index].watchers = 0;
             user_nsp.emit('user:update_video_socketId', {
                 video_socketId:robots[index].video_socketId,
                 id:robots[index]._id
@@ -214,20 +221,60 @@ function userConnection(socket) {
     var addressIP = socket.handshake.address;
     logger("User connection from " + addressIP + ", socket id: " + socket.id);
 
-    socket.on('server_user_nsp:join_to_robot_chanel', function(data) {
-        logger('server:join_to_robot_chanel:'+ data.chanel);
+    socket.on("server_user_nsp:join_to_robot_chanel", function(data) {
+        logger("server:join_to_robot_chanel:"+ data.chanel);
         socket.join(data.chanel);
     });
-    /*
-                Socket.emit("server_user_nsp:update_speed", {
-                    motor_a_speed = $scope.robot.motor.motor_a_speed,
-                    motor_b_speed = $scope.robot.motor.motor_b_speed,
-                    robotId = $scope.robot.control_socketId;
-                }
-                */
+
+    socket.on("server_user_nsp:update_speed", function(data) {
+        logger("[on] server_user_nsp:update_speed");
+        logger("[emit] robot:update_speed:" + JSON.stringify(data));
+        control_nsp.to(data.robotId).emit('robot:update_speed', {
+           motor_a_speed:data.motor_a_speed,
+           motor_b_speed:data.motor_b_speed
+        });
+    });
+
+    socket.on("server_user_nsp:stop_video", function (data) {
+        logger("[on] server_user_nsp:stop_video:" + data.video_chanel);
+        logger("[leave]" + socket.id + "leave" + data.video_chanel);
+        socket.leave(data.video_chanel);
+
+        for (var index = 0; index < robots.length; index++) {
+            if (robots[index].video_socketId == data.video_chanel) {
+                break;
+            }
+        }
+
+        robots[index].watchers--;
+        if (robots[index].watchers == 0) {
+            logger("[emit] video:stop_video, chenel" + data.video_chanel);
+            video_nsp.to(data.video_chanel).emit("video:stop_video");
+        }
+
+
+    });
+
+    socket.on("server_user_nsp:start_video", function (data) {
+        logger("[on] server_user_nsp:start_video" + data.video_chanel);
+        logger("[join]" + socket.id + "join" + data.video_chanel);
+        socket.join(data.video_chanel);
+
+        for (var index = 0; index < robots.length; index++) {
+            if (robots[index].video_socketId == data.video_chanel) {
+                break;
+            }
+        }
+
+        robots[index].watchers++;
+
+        if (robots[index].watchers == 1) {
+            logger("[emit] video:start_video, chenel" + data.video_chanel);
+            video_nsp.to(data.video_chanel).emit("video:start_video");
+        }
+
+    });
 }
-
-
 /*
 
 

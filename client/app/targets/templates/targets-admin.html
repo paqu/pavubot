@@ -9,7 +9,8 @@
           <span ng-if="robot.video_socketId != 'no connection'">uzyskano połączenie</span>
         </div>
             <div class="panel-body h-321">
-                <canvas class="video-contener" id="canvas-video" width="320" height="240"></canvas>
+              <div ng-show="!video_frame && robot.video_socketId != 'no connection'" class="video-contener">Włącz transmisje</div>
+              <img ng-src="{{video_frame}}" ng-show="video_frame" class="video-contener" id="canvas-video">
                 <div class="btn-group btn-group-justified btn-video" ng-if="robot.video_socketId != 'no connection'" role="group">
                   <div class="btn-group" role="group">
                     <button type="button" class="btn btn-info" ng-click="start_video()">Start</button>
@@ -135,14 +136,16 @@
                 
 
                   <div class="input-group input-group-sm" style="margin-top:25px;margin-bottom:25px">
-                   <label class="radio-inline"><input type="radio" name="optradio">Sonar</label>
-                   <label class="radio-inline"><input type="radio" name="optradio">Podczerwień</label> 
+                   <label class="radio-inline"><input type="radio" name="distance_sensor" ng-model="distance_sensor" value="sonar">Sonar</label>
+                   <label class="radio-inline"><input type="radio" name="distance_sensor" ng-model="distance_sensor" value="infrared">Podczerwień</label> 
                   </div>
 
 
                 <div class="input-group input-group-sm">
                   <span class="input-group-addon" id="sizing-addon3">Odległość</span>
-                  <input  disabled class="form-control" placeholder="" aria-describedby="sizing-addon3">
+                  <div class="form-control" ng-show="distance_sensor == 'sonar'">{{robot.distance_sensor.sonar}} </div>
+                  <div class="form-control" ng-show="distance_sensor == 'infrared'">{{robot.distance_sensor.infrared}}</div>
+                  <!-- <input  disabled class="form-control" placeholder="" aria-describedby="sizing-addon3"> -->
                 </div>
               </div>
 

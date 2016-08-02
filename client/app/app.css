@@ -16,6 +16,9 @@ div.rightToLeft > div {
 .video-contener {
 	display:block;
 	margin:0 auto;
+	width:320px;
+	height:240px;
+	text-align:center;
 }
 .btn-video {
 	position:relative;
@@ -26,4 +29,10 @@ div.rightToLeft > div {
 }
 .btn-video:hover {
 	opacity:1;
+}
+.hidden { 
+	border:20px solid #fff;
+}
+.show {
+	border:20px solid #ccc;
 }
