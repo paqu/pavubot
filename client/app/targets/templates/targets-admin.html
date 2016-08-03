@@ -1,4 +1,53 @@
-<div class="container">
+
+    <script>
+        $(document).ready(function() {
+          $(document).on({
+            keydown:function (event) {
+              if (event.which === 79) {
+                $('#up').addClass('btn-info');
+                angular.element($('#robotCtrl')).scope().go_forward();
+              } else if (event.which === 76) {
+                $('#down').addClass('btn-info');
+                angular.element($('#robotCtrl')).scope().go_backward();
+              } else if (event.which === 75) {
+                $('#left').addClass('btn-info');
+                angular.element($('#robotCtrl')).scope().go_left();
+              } else if (event.which === 186) {
+                $('#right').addClass('btn-info');
+                angular.element($('#robotCtrl')).scope().go_right();
+              } else if (event.which === 90) {
+                angular.element($('#robotCtrl')).scope().left_servo_down();
+              } else if (event.which === 88) {
+                angular.element($('#robotCtrl')).scope().right_servo_down();
+              } else if (event.which === 65) {
+                angular.element($('#robotCtrl')).scope().decrease_dir_angle();
+              } else if (event.which === 83) {
+                angular.element($('#robotCtrl')).scope().increase_dir_angle();
+              }
+
+
+            },
+            keyup:function (event) {   
+              if (event.which === 79) {
+                angular.element($('#robotCtrl')).scope().stop();
+                $('#up').removeClass('btn-info');
+              } else if (event.which === 76) {
+                angular.element($('#robotCtrl')).scope().stop();
+                $('#down').removeClass('btn-info');
+              } else if (event.which === 75) {
+                $('#left').removeClass('btn-info');
+              } else if (event.which === 186) {
+                $('#right').removeClass('btn-info');
+              } else if (event.which === 90) {
+                angular.element($('#robotCtrl')).scope().change_servo_angle();
+              } else if (event.which === 88) {
+                angular.element($('#robotCtrl')).scope().change_servo_angle();
+              }
+            }
+          });
+        });
+    </script>
+<div class="container" id="robotCtrl" ng-controller="RobotCtrl">
   <div class="row">
     <h2 class="text-center" style="margin-top:0;margin-bottom:20px"> Panel sterowania robotem {{robot.name}} </h2>
     <h2 class="text-center" style="margin-top:0;margin-bottom:20px"> Video id: {{robot.video_socketId}} </h2>
@@ -36,16 +85,11 @@
                     <span class="col-xs-1">90</span>
                   </div>
                   <div class="row">
-                    <div class="progress rightToLeft col-xs-6">
-                      <div class="progress-bar progress-bar-success" role="progressbar" style="width:40%"></div>
-                      <div class="progress-bar progress-bar-warning" role="progressbar" style="width:10%"></div>
-                      <div class="progress-bar progress-bar-danger" role="progressbar" style="width:20%"></div>
+                    <div class="progress progress_clear rightToLeft col-xs-6">
+                      <div class="progress-bar progress-bar-success" role="progressbar" style="width:{{-robot.servo.angle/90 * 100}}%"></div>
                     </div>
-
-                    <div class="progress col-xs-6">
-                      <div class="progress-bar progress-bar-success" role="progressbar" style="width:1%"></div>
-                      <div class="progress-bar progress-bar-warning" role="progressbar" style="width:10%"></div>
-                      <div class="progress-bar progress-bar-danger" role="progressbar" style="width:20%"></div>
+                    <div class="progress progress_clear col-xs-6">
+                      <div class="progress-bar progress-bar-success" role="progressbar" style="width:{{robot.servo.angle/90 * 100}}%"></div>
                     </div>
                   </div>
 
@@ -56,24 +100,10 @@
               <div class="col-md-12">
                 <div id="angle">
                   <div class="row">
-                    <span class="col-md-12 text-center">Kąt obrotu</span>
+                    <span class="col-md-12 text-center">Kąt obrotu: <input type="number" min="0" max="180" ng-model="change_direction_by" style="background:#fff;border:0;">[0 - 180]</span>
                   </div>
                   <div class="row">
-                    <span class="col-xs-1">-180</span>
-                    <span class="col-xs-10 text-center">0</span>
-                    <span class="col-xs-1">180</span>
-                  </div>
-                  <div class="row">
-                    <div class="progress rightToLeft col-xs-6">
-                        <div class="progress-bar progress-bar-success" role="progressbar" style="width:40%"></div>
-                        <div class="progress-bar progress-bar-warning" role="progressbar" style="width:10%"></div>
-                        <div class="progress-bar progress-bar-danger" role="progressbar" style="width:20%"></div>
-                    </div>
-                    <div class="progress col-xs-6">
-                        <div class="progress-bar progress-bar-success" role="progressbar" style="width:40%"></div>
-                        <div class="progress-bar progress-bar-warning" role="progressbar" style="width:10%"></div>
-                        <div class="progress-bar progress-bar-danger" role="progressbar" style="width:20%"></div>
-                    </div>
+                    <span class="col-xs-12 text-center"></span>
                   </div>
                 </div>
               </div>

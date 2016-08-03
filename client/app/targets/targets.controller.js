@@ -48,8 +48,12 @@ angular.module('inzApp')
 }])
 
     .controller('RobotCtrl',['$scope','$state', '$http','$document', 'Socket', '$stateParams', function ($scope, $state, $http, $document, Socket, $stateParams) {
+        var key_down = false;
+        var change_direction = false;
+
         $scope.robot = {};
-        
+        $scope.change_direction_by = 90;
+
         $scope.state = 'stop';
         $scope.distance_sensor = 'sonar';
         $scope.video = 'hidden';
@@ -95,6 +99,93 @@ angular.module('inzApp')
                     robotId : $scope.robot.control_socketId
                 });
             }
+        }
+
+        $scope.go_forward = function () {
+            if (!key_down) {
+                key_down = true;
+                console.log("robot go_forwad");
+                $scope.robot.motor.motor_a_mode = "cw";
+                $scope.robot.motor.motor_b_mode = "ccw";
+                console.log("[emit] server_user_nsp:robot_go_forward");
+                Socket.emit("server_user_nsp:robot_go_forward", {
+                    motor_a_mode : $scope.robot.motor.motor_a_mode,
+                    motor_b_mode : $scope.robot.motor.motor_b_mode,
+                    robotId : $scope.robot.control_socketId
+                });
+            }
+        }
+
+        $scope.go_backward = function () {
+            if (!key_down) {
+                key_down = true;
+                console.log("robot go_backward");
+                $scope.robot.motor.motor_a_mode = "ccw";
+                $scope.robot.motor.motor_b_mode = "cw";
+                console.log("[emit] server_user_nsp:robot_go_backward");
+                Socket.emit("server_user_nsp:robot_go_backward", {
+                    motor_a_mode : $scope.robot.motor.motor_a_mode,
+                    motor_b_mode : $scope.robot.motor.motor_b_mode,
+                    robotId : $scope.robot.control_socketId
+                });
+            }
+        }
+
+        $scope.go_left = function () {
+                console.log("robot go_left");
+        }
+
+        $scope.go_right = function () {
+                console.log("robot go_right");
+        }
+
+        $scope.decrease_dir_angle = function () {
+            if ($scope.change_direction_by > 0) {
+                console.log("decrease direction angle");
+                $scope.$apply($scope.change_direction_by -= 1);
+            }
+        }
+
+        $scope.increase_dir_angle = function () {
+            if ($scope.change_direction_by < 180) {
+                console.log("increase direction angle");
+                $scope.$apply($scope.change_direction_by += 1);
+            }
+        }
+
+        $scope.left_servo_down = function () {
+            if ($scope.robot.servo.angle > -90) {
+                console.log("left servo down");
+                $scope.$apply($scope.robot.servo.angle = Number($scope.robot.servo.angle) - 1);
+            }
+        }
+
+        $scope.right_servo_down = function () {
+            if ($scope.robot.servo.angle < 90) {
+                console.log("right servo down");
+                $scope.$apply($scope.robot.servo.angle = Number($scope.robot.servo.angle) + 1);
+            }
+        }
+        $scope.change_servo_angle = function () {
+                console.log("[emit] server_user_nsp:robot_change_servo_angle," + $scope.robot.servo.angle);
+                Socket.emit("server_user_nsp:robot_change_servo_angle", {
+                    servo_angle : $scope.robot.servo.angle,
+                    robotId : $scope.robot.control_socketId
+                });
+        }
+
+
+        $scope.stop = function () {
+            key_down = false;
+            console.log('robot stop');
+            $scope.robot.motor.motor_a_mode = "stop";
+            $scope.robot.motor.motor_b_mode = "stop";
+            console.log("[emit] server_user_nsp:robot_stop");
+            Socket.emit("server_user_nsp:update_speed", {
+                motor_a_speed : $scope.robot.motor.motor_a_speed,
+                motor_b_speed : $scope.robot.motor.motor_b_speed,
+                robotId : $scope.robot.control_socketId
+            });
         }
 
         $http.get('/api/robots/' + $stateParams.id).then(function (response) {

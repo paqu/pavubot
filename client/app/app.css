@@ -36,3 +36,6 @@ div.rightToLeft > div {
 .show {
 	border:20px solid #ccc;
 }
+.progress_clear {
+	padding:0;
+}
