@@ -16,11 +16,11 @@ if (!PORT)
     PORT = 1234;
 
 if (!HOST)
-    HOST = 'localhost/video';
+    HOST = 'localhost';
 
 var url = 'http://'+ HOST + ':' + PORT+'/video';
 
-var conn = io('http://localhost:1234/video');
+var conn = io(url);
 var interval;
 var camWidth = 320;
 var camHeight = 240;
@@ -30,7 +30,7 @@ var camera = new cv.VideoCapture(0);
 
 
 conn.on('connect', function (data) {
-    logger('Connected');
+    logger('Connected to ' + url);
 });
 
 conn.on('disconnect', function () {
