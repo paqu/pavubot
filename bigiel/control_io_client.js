@@ -8,6 +8,7 @@ var options = commandLineArgs([
         { name : 'filenames',alias:'f',multiple:true, type: String },
         { name : 'host',alias:'h', type: String },
         { name : 'port',alias:'p', type: Number },
+        { name : 'path',alias:'P', type: String },
 ]);
 
 /*
@@ -21,12 +22,16 @@ var watcher = chokidar.watch(options.filenames, {
 
 var PORT = options.port;
 var HOST = options.host;
+var PATH = options.path
 
 if (!PORT)
     PORT = 1234;
 
 if (!HOST)
     HOST = 'localhost';
+
+if (!PATH)
+    PATH = '';
 
 var url = 'http://'+ HOST + ':' + PORT+'/control';
 
@@ -57,7 +62,7 @@ var init_data = {
 
 var SEND = 10;
 var count = 0;
-var PATH="";
+
 var paths = new Array();
 
 paths["motor_a_mode"]  = PATH + "dev/ddal/motor/motor_a_mode";
