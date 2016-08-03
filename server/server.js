@@ -228,7 +228,17 @@ function userConnection(socket) {
 
     socket.on("server_user_nsp:update_speed", function(data) {
         logger("[on] server_user_nsp:update_speed");
+
+        for (var index = 0; index < robots.length; index++) {
+            if (robots[index].control_socketId  == data.robotId) {
+                break;
+            }
+        }
+        robots[index].motor.motor_a_speed = data.motor_a_speed;
+        robots[index].motor.motor_b_speed = data.motor_b_speed;
+
         logger("[emit] robot:update_speed:" + JSON.stringify(data));
+
         control_nsp.to(data.robotId).emit('robot:update_speed', {
            motor_a_speed:data.motor_a_speed,
            motor_b_speed:data.motor_b_speed
