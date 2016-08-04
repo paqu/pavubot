@@ -47,72 +47,35 @@ angular.module('inzApp')
         });
 }])
 
-    .controller('RobotCtrl',['$scope','$state', '$http','$document', 'Socket', '$stateParams', function ($scope, $state, $http, $document, Socket, $stateParams) {
+    .controller('RobotCtrl',['$scope','$state', '$http','$document','$timeout', 'Socket', '$stateParams', function ($scope, $state, $http, $document,$timeout, Socket, $stateParams) {
+        var UPDATE_SPEED = "server_user_nsp:update_speed";
+        var SERVO_CHANGE = "server_user_nsp:robot_change_servo_angle";
+        var ROBOT_MOVE   = "server_user_nsp:robot_move";
+        var STOP_VIDEO   = "server_user_nsp:stop_video";
+        var START_VIDEO  = "server_user_nsp:start_video";
+
+        var BASE_SPEED_ERR_MSG  = "Wprowadz wartość z przedziału [0-100] w polu";
+        var LEFT_SPEED_ERR_MSG  = BASE_SPEED_ERR_MSG + " 'Lewy'." ;
+        var RIGHT_SPEED_ERR_MSG = BASE_SPEED_ERR_MSG + " 'Prawy'.";
+        var LEFT_RIGHT_SPEED_ERR_MSG = LEFT_SPEED_ERR_MSG + " " + RIGHT_SPEED_ERR_MSG;
+
         var key_down = false;
         var change_direction = false;
+        var isStart = false;
 
         $scope.robot = {};
         $scope.change_direction_by = 90;
-
-        $scope.state = 'stop';
         $scope.distance_sensor = 'sonar';
-        $scope.video = 'hidden';
-
-
-        $scope.stop_video = function () {
-            if ($scope.state === 'start') {
-                console.log(new Date() + ":stop video transmision");
-                $scope.state = 'stop';
-                console.log("[emit]:server_user_nsp:stop_video:" + $scope.robot.video_socketId);
-                Socket.emit("server_user_nsp:stop_video",{video_chanel:$scope.robot.video_socketId});
-                $scope.video_frame = "";
-            }
-
-        }
-
-        $scope.start_video  = function () {
-            if ($scope.state === 'stop') {
-                console.log(new Date() + "start video transmision");
-                $scope.state = 'start';
-                console.log("[emit]:server_user_nsp:start_video:" + $scope.robot.video_socketId);
-                Socket.emit("server_user_nsp:start_video",{video_chanel:$scope.robot.video_socketId});
-            }
-        }
-
-        $scope.update_speed = function () {
-            if (($scope.robot.motor.motor_a_speed === undefined) && ($scope.robot.motor.motor_b_speed === undefined)) {
-                $scope.error_msg = 'Wprowadz wartość z przedziału [0-100] w polu "Lewy" \nWprowadz wartość z przedziału [0-100] w polu "Prawy"';
-                $scope.error = true;
-            } else  if ($scope.robot.motor.motor_a_speed === undefined) {
-                $scope.error_msg = 'Wprowadz wartość z przedziału [0-100] w polu "Lewy"';
-                $scope.error = true;
-            }else if ($scope.robot.motor.motor_b_speed === undefined) {
-                $scope.error_msg = 'Wprowadz wartość z przedziału [0-100] w polu "Prawy"';
-                $scope.error = true;
-            }else {
-                $scope.error_msg = "";
-                $scope.error = false;
-                console.log("[emit] server_user_nsp:update_speed, " + $scope.robot.control_socketId);
-                Socket.emit("server_user_nsp:update_speed", {
-                    motor_a_speed : $scope.robot.motor.motor_a_speed,
-                    motor_b_speed : $scope.robot.motor.motor_b_speed,
-                    robotId : $scope.robot.control_socketId
-                });
-            }
-        }
+        $scope.isSpeedError;
+        $scope.speed_error_msg;
 
         $scope.go_forward = function () {
             if (!key_down) {
                 key_down = true;
                 console.log("robot go_forwad");
-                $scope.robot.motor.motor_a_mode = "cw";
-                $scope.robot.motor.motor_b_mode = "ccw";
-                console.log("[emit] server_user_nsp:robot_go_forward");
-                Socket.emit("server_user_nsp:robot_go_forward", {
-                    motor_a_mode : $scope.robot.motor.motor_a_mode,
-                    motor_b_mode : $scope.robot.motor.motor_b_mode,
-                    robotId : $scope.robot.control_socketId
-                });
+                setMotorAMode("cw");
+                setMotorBMode("ccw");
+                emitToServerRobotMove();
             }
         }
 
@@ -120,16 +83,12 @@ angular.module('inzApp')
             if (!key_down) {
                 key_down = true;
                 console.log("robot go_backward");
-                $scope.robot.motor.motor_a_mode = "ccw";
-                $scope.robot.motor.motor_b_mode = "cw";
-                console.log("[emit] server_user_nsp:robot_go_backward");
-                Socket.emit("server_user_nsp:robot_go_backward", {
-                    motor_a_mode : $scope.robot.motor.motor_a_mode,
-                    motor_b_mode : $scope.robot.motor.motor_b_mode,
-                    robotId : $scope.robot.control_socketId
-                });
+                setMotorAMode("ccw");
+                setMotorBMode("cw");
+                emitToServerRobotMove();
             }
         }
+        
 
         $scope.go_left = function () {
                 console.log("robot go_left");
@@ -142,51 +101,209 @@ angular.module('inzApp')
         $scope.decrease_dir_angle = function () {
             if ($scope.change_direction_by > 0) {
                 console.log("decrease direction angle");
-                $scope.$apply($scope.change_direction_by -= 1);
+                $scope.change_direction_by -= 1;
+                updateView();
             }
         }
 
         $scope.increase_dir_angle = function () {
             if ($scope.change_direction_by < 180) {
                 console.log("increase direction angle");
-                $scope.$apply($scope.change_direction_by += 1);
+                $scope.change_direction_by += 1;
+                updateView();
             }
         }
 
-        $scope.left_servo_down = function () {
-            if ($scope.robot.servo.angle > -90) {
-                console.log("left servo down");
-                $scope.$apply($scope.robot.servo.angle = Number($scope.robot.servo.angle) - 1);
+        $scope.update_speed       = updateSpeed; 
+        $scope.stop_video         = stopVideo;
+        $scope.start_video        = startVideo;
+        $scope.stop               = robotStop;
+        $scope.servo_max_left     = setServoMin;
+        $scope.servo_max_right    = setServoMax;
+        $scope.servo_center       = setServoCenter;
+        $scope.left_servo_down    = decreaseServoAngle;
+        $scope.right_servo_down   = increaseServoAngle;
+        $scope.change_servo_angle = emitToServerServoChange;
+
+        function updateSpeed() {
+            if ((!getMotorASpeed()) && (!getMotorBSpeed())) {
+                setSpeedError(LEFT_RIGHT_SPEED_ERR_MSG);
+                return;
+            }
+
+            if (!getMotorASpeed()) {
+                setSpeedError(LEFT_SPEED_ERR_MSG);
+                return;
+            }
+
+            if (!getMotorBSpeed()) {
+                setSpeedError(RIGHT_SPEED_ERR_MSG);
+                return;
+            }
+
+            clearSpeedError();
+            emitToServerUpdateSpeed();
+        }
+
+        function stopVideo() {
+            if (isStart) {
+                isStart = false;
+                emitToServerStopVideo();
+                $scope.video_frame = "";
+            }
+        }
+        
+        function startVideo() {
+            if (!isStart) {
+                isStart = true;
+                emitToServerStartVideo();
             }
         }
 
-        $scope.right_servo_down = function () {
-            if ($scope.robot.servo.angle < 90) {
-                console.log("right servo down");
-                $scope.$apply($scope.robot.servo.angle = Number($scope.robot.servo.angle) + 1);
+
+
+        function robotStop() {
+            key_down = false;
+            console.log('robot stop');
+            setMotorAMode("stop");
+            setMotorBMode("stop");
+            emitToServerRobotMove();
+        }
+        
+        function setServoMin() {
+            console.log("set servo to min");
+            setServo(-90);
+            updateView();
+            emitToServerServoChange();
+        }
+        
+        function setServoMax() {
+            console.log("set servo to max");
+            setServo(90);
+            updateView();
+            emitToServerServoChange();
+
+        }
+        
+        function setServoCenter() {
+            console.log("set servo to center");
+            setServo(0);
+            updateView();
+            emitToServerServoChange();
+        }
+
+        function decreaseServoAngle() {
+            if (getServo() > -90) {
+                setServo(getServo() - 1);
+                updateView();
             }
         }
-        $scope.change_servo_angle = function () {
-                console.log("[emit] server_user_nsp:robot_change_servo_angle," + $scope.robot.servo.angle);
-                Socket.emit("server_user_nsp:robot_change_servo_angle", {
-                    servo_angle : $scope.robot.servo.angle,
-                    robotId : $scope.robot.control_socketId
+        function increaseServoAngle() {
+            if (getServo() < 90) {
+                setServo(getServo() + 1);
+                updateView();
+            }
+        }
+
+        function emitToServerServoChange() {
+            console.log("[emit] "+ SERVO_CHANGE + "," + getServo());
+            Socket.emit(SERVO_CHANGE, {
+                servo_angle : getServo(),
+                robotId     : getRobotId()
+            });
+        }
+
+        function emitToServerRobotMove() {
+            console.log("[emit] " + ROBOT_MOVE);
+            Socket.emit(ROBOT_MOVE, {
+                motor_a_mode : getMotorAMode(),
+                motor_b_mode : getMotorBMode(),
+                robotId      : getRobotId() 
+            });
+        }
+
+        function emitToServerUpdateSpeed() {
+                console.log("[emit] " + UPDATE_SPEED + "," + getRobotId());
+                Socket.emit(UPDATE_SPEED, {
+                    motor_a_speed : getMotorASpeed(),
+                    motor_b_speed : getMotorBSpeed(),
+                    robotId       : getRobotId()
                 });
         }
 
+        function emitToServerStopVideo() {
+                console.log("[emit]:"+ STOP_VIDEO + "," + getRobotVideoId());
+                Socket.emit(STOP_VIDEO,{
+                    video_chanel:getRobotVideoId()
+                });
 
-        $scope.stop = function () {
-            key_down = false;
-            console.log('robot stop');
-            $scope.robot.motor.motor_a_mode = "stop";
-            $scope.robot.motor.motor_b_mode = "stop";
-            console.log("[emit] server_user_nsp:robot_stop");
-            Socket.emit("server_user_nsp:update_speed", {
-                motor_a_speed : $scope.robot.motor.motor_a_speed,
-                motor_b_speed : $scope.robot.motor.motor_b_speed,
-                robotId : $scope.robot.control_socketId
-            });
         }
+
+        function emitToServerStartVideo() {
+                console.log("[emit]:"+ START_VIDEO + "," + getRobotVideoId());
+                Socket.emit(START_VIDEO,{
+                    video_chanel:getRobotVideoId()
+                });
+        }
+
+        function updateView() {
+            $scope.$apply();
+        }
+
+        function setSpeedError(msg) {
+            $scope.speed_error_msg = msg;
+            $scope.isSpeedError = true;
+        }
+        function getSpeedError() {
+            return $scope.speed_error_msg;
+        }
+
+        function clearSpeedError() {
+            $scope.speed_error_msg = "";
+            $scope.isSpeedError = false;
+        }
+
+
+        function getRobotId() {
+            return $scope.robot.control_socketId;
+        }
+
+        function getRobotVideoId () {
+            return $scope.robot.video_socketId;
+        }
+
+        function getMotorASpeed() {
+            return $scope.robot.motor.motor_a_speed;
+        }
+
+        function getMotorBSpeed() {
+            return $scope.robot.motor.motor_b_speed;
+        }
+
+        function setMotorAMode(value) {
+                $scope.robot.motor.motor_a_mode = value;
+        }
+
+        function setMotorBMode(value) {
+                $scope.robot.motor.motor_b_mode = value;
+        }
+
+        function getMotorAMode() {
+            return $scope.robot.motor.motor_a_mode;
+        }
+
+        function getMotorBMode() {
+            return $scope.robot.motor.motor_b_mode;
+        }
+
+        function setServo(val) {
+            $scope.robot.servo.angle = val;
+        }
+
+        function getServo() {
+            return Number($scope.robot.servo.angle);
+        }
+
 
         $http.get('/api/robots/' + $stateParams.id).then(function (response) {
             $scope.robot = response.data;
@@ -239,7 +356,6 @@ angular.module('inzApp')
             $scope.video_frame = 'data:image/png;base64,' + base64String;
 
         });
-
 
         $scope.$on('$destroy', function () {
             console.log("[on] $destroy");

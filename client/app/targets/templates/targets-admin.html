@@ -3,6 +3,7 @@
         $(document).ready(function() {
           $(document).on({
             keydown:function (event) {
+              console.log(event.which);
               if (event.which === 79) {
                 $('#up').addClass('btn-info');
                 angular.element($('#robotCtrl')).scope().go_forward();
@@ -23,6 +24,12 @@
                 angular.element($('#robotCtrl')).scope().decrease_dir_angle();
               } else if (event.which === 83) {
                 angular.element($('#robotCtrl')).scope().increase_dir_angle();
+              } else if (event.which === 67) {
+                angular.element($('#robotCtrl')).scope().servo_max_left();
+              } else if (event.which === 86) {
+                angular.element($('#robotCtrl')).scope().servo_center();
+              } else if (event.which === 66) {
+                angular.element($('#robotCtrl')).scope().servo_max_right();
               }
 
 
@@ -153,8 +160,8 @@
                     <input  class="form-control" placeholder="predkość [0-100]" ng-pattern="/^([0-9]|[1-9][0-9]|100)$/" ng-model="robot.motor.motor_b_speed" required>
                   </div>
                   <br>
-                  <div class="alert alert-danger" ng-show="error">
-                    {{error_msg}}
+                  <div class="alert alert-danger" ng-show="isSpeedError">
+                    {{speed_error_msg}}
                   </div>
                   <div class="input-group input-group-sm pull-right" style="">
                     <input  type="submit" class="btn btn-primary " value="Ustaw">
