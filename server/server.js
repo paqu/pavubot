@@ -221,10 +221,22 @@ function userConnection(socket) {
     var addressIP = socket.handshake.address;
     logger("User connection from " + addressIP + ", socket id: " + socket.id);
 
+    /*
+     *
+     *
+     *
+     */
+
     socket.on("server_user_nsp:join_to_robot_chanel", function(data) {
         logger("server:join_to_robot_chanel:"+ data.chanel);
         socket.join(data.chanel);
     });
+
+    /*
+     *
+     *
+     *
+     */
 
     socket.on("server_user_nsp:update_speed", function(data) {
         logger("[on] server_user_nsp:update_speed");
@@ -242,6 +254,31 @@ function userConnection(socket) {
         control_nsp.to(data.robotId).emit('robot:update_speed', {
            motor_a_speed:data.motor_a_speed,
            motor_b_speed:data.motor_b_speed
+        });
+    });
+
+    /*
+     *
+     *
+     *
+     */
+
+    var SERVO_CHANGE = "server_user_nsp:robot_change_servo_angle";
+    var SERVO_UPDATE = "robot:update_servo_angle";
+
+    socket.on(SERVO_CHANGE, function(data) {
+        logger("[on] " + SERVO_CHANGE);
+
+        for (var index = 0; index < robots.length; index++) {
+            if (robots[index].control_socketId  == data.robotId) {
+                break;
+            }
+        }
+        robots[index].servo.angle = data.servo_angle;
+
+        logger("[emit] "+ SERVO_UPDATE + JSON.stringify(data));
+        control_nsp.to(data.robotId).emit(SERVO_UPDATE, {
+           servo_angle:data.servo_angle,
         });
     });
 
@@ -284,91 +321,15 @@ function userConnection(socket) {
         }
 
     });
+
+   socket.on('disconnect', function() {
+        logger(" Disconnet: " + addressIP + "," + socket.id);
+    });
 }
-/*
-
-
-
-    socket.on('disconnect', function() {
-        logger(" Disconnet: " + addressIP);
-        io.emit('remove-target', {id:target._id});
-        targets.splice(targets.indexOf(target,1));
-    });
-});
-
-    */
-//======================================================================
-//
-
-    /*
-video_nsp.on('connection',  function(socket){
-    var addressIP = socket.handshake.address;
-    logger("Video connection from " + addressIP + ", socket id: " + socket.id);
-
-    logger("Send socket id " + socket.id + " to " + addressIP);
-    socket.emit('video:video_socketId', { socketId:socket.id});
-
-
-
-});
-
-    */
-
-
-  /*
-user_nsp.on('connection',  function(socket){
-    var addressIP = socket.handshake.address;
-
-    logger("User connection from " + addressIP + ", socket id: " + socket.id);
-
-
-
-
-
-
-
-
-    socket.on('request-targets', function () {
-        logger("request-targets event occured");
-        socket.emit('targets', {targets:targets});
-    }); 
-
-    socket.on('request-target', function (data) {
-        logger("request-targets event occured");
-
-        
-        for (var i = 0; i < targets.length; i++)
-            if (data.id == targets[i]._id) 
-                break;
-
-        socket.emit('target',{target:targets[i]});
-    });
-
-    socket.on('', function (data) {
-        logger("joinToTarget event occured, chanel: " + data.chanel);
-        socket.join(data.chanel);
-    });
-
-    socket.on('leaveTarget', function (data) {
-        logger("leave event occured");
-        socket.leave(data.chanel);
-    });
-
-
-    socket.on('disconnect', function() {
-        logger("Disconnet: " + addressIP);
-    });
-
-});
-    */
-
-
 //======================================================================
 function startServer() {
     server.listen(config.port, config.io, function() {
-        logger("Express server listening on "
-                + config.port + ", in "+ app.get('env')
-                + " mode","gray");
+        logger("Express server listening on " + config.port + ", in "+ app.get('env')+ " mode","gray");
     });
 }
 

@@ -183,6 +183,11 @@ conn.on("robot:update_speed", function(data) {
     writeToFile(paths["motor_b_speed"], data.motor_b_speed);
 });
 
+var SERVO_UPDATE = "robot:update_servo_angle";
+conn.on(SERVO_UPDATE, function(data) {
+    logger("[on] " + SERVO_UPDATE);
+    writeToFile(paths["angle"], data.servo_angle);
+});
 
 function writeToFile(path, value) {
     fs.writeFile(path, value, (err) => {
