@@ -7,10 +7,15 @@ var logger = require('../lib/logger');
 var options = commandLineArgs([
         { name : 'host',alias:'h', type: String },
         { name : 'port',alias:'p', type: Number },
+        { name : 'fps' ,alias:'f', type: Number },
 ]);
 
+var FPS  = options.fps;
 var PORT = options.port;
 var HOST = options.host;
+
+if (!FPS)
+    FPS = 20;
 
 if (!PORT)
     PORT = 1234;
@@ -24,9 +29,10 @@ var conn = io(url);
 var interval;
 var camWidth = 320;
 var camHeight = 240;
-var camFps = 10;
-var camInterval = 1000 / camFps;
+var camInterval = 1000 / FPS;
 var camera = new cv.VideoCapture(0);
+camera.setWidth(camWidth);
+camera.setHeight(camHeight);
 
 
 conn.on('connect', function (data) {
