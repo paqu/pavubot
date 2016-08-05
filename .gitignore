@@ -1,3 +1,5 @@
 node_modules/
 bigiel/node_modules
 bigiel/dev/*
+*.swp
+*.s*
