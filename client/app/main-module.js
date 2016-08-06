@@ -1,6 +1,9 @@
 'use strict';
 
 angular.module('inzApp', [
+  'inzApp.auth',
+  'inzApp.admin',
+  'inzApp.constants',
   'ngCookies',
   'ngResource',
   'ngSanitize',
@@ -11,16 +14,7 @@ angular.module('inzApp', [
 ]);
 
 angular.module('inzApp')
-.config(function($stateProvider, $urlRouterProvider) { //, $locationProvider) {
-
+.config(function($urlRouterProvider, $locationProvider) {
     $urlRouterProvider.otherwise('/');
-    $stateProvider
-        .state('test', {
-            url:'/test',
-            templateUrl:'app/targets/test.html',
-            controller:'TargetsCtrl'
-        });
-
     //$locationProvider.html5Mode(true);
-
-});
+})
