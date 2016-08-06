@@ -13,18 +13,7 @@
   </head>
   <body ng-app="inzApp">
 
-  <!-- pozbyc sie tego jako dyrektywa navbar --> 
-    <nav class="navbar navbar-inverse menu" role="navigation">
-      <div class="navbar-header">
-        <a class="navbar-brand" ui-sref="#">Pavubot</a>
-      </div>
-      <ul class="nav navbar-nav">
-        <li> <a ui-sref="robots"> Lista robotów </a> </li>
-        <li> <a ui-sref="wanted"> Lista poszukiwanych </a> </li>
-      </ul>
-    </nav>
-   <!-- navbar -->
-
+    <navbar></navbar>
     <div ui-view=""></div>
     <!-- <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script> -->
 
@@ -42,13 +31,12 @@
 
 
       <script src="app/main-module.js"></script>
-      <script src="app/common/socket/socket.svc.js"></script>
+      <script src="app/common/socket/socket.service.js"></script>
       <script src="app/targets/targets.js"> </script>
       <script src="app/targets/targets.controller.js"> </script>
       <script src="app/wanted/wanted.js"> </script>
       <script src="app/wanted/wanted.controller.js"> </script>
       <script src="app/wanted/wanted.service.js"> </script>
-
   </body>
 </html>
      
