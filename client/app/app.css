@@ -39,3 +39,10 @@ div.rightToLeft > div {
 .progress_clear {
 	padding:0;
 }
+.pavubot-input-margin{
+	margin-bottom:15px;
+}
+.pavubot-input-margin-button {
+	margin-bottom:20px;
+}	
+
