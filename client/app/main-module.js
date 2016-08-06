@@ -2,7 +2,6 @@
 
 angular.module('inzApp', [
   'inzApp.auth',
-  'inzApp.admin',
   'inzApp.constants',
   'ngCookies',
   'ngResource',
