@@ -1,6 +1,6 @@
 var _               = require('lodash');
 var path            = require('path'); /* config/index.js */
-var logger          = require('./lib/logger.js');
+var logger          = require('simple-logger');
 var ObjectID        = require('mongodb').ObjectID;
 var socketio_server = require('socket.io');
 var http            = require('http'); 
