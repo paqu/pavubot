@@ -7,5 +7,5 @@ angular.module('inzApp.auth', [
   'ui.router'
 ])
   .config(function($httpProvider) {
-    //$httpProvider.interceptors.push('authInterceptor');
+    $httpProvider.interceptors.push('authInterceptor');
   });
