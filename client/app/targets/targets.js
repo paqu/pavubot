@@ -10,6 +10,7 @@ angular.module('inzApp')
         .state('target-admin', {
             url:'/robots/:id/admin',
             templateUrl:'app/targets/templates/targets-admin.html',
+            authenticate:true
         })
         .state('target-watcher', {
             url:'/targets/:id/watcher',

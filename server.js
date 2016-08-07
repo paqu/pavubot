@@ -6,13 +6,14 @@ var socketio_server = require('socket.io');
 var http            = require('http'); 
 var app             = require('./app');
 var config          = require('./config');
+var auth            = require('./auth/auth.service');
 
 
 app.get('/api/robots/', function (req,res) {
     res.json(robots);
 });
 
-app.get('/api/robots/:id', function (req,res) {
+app.get('/api/robots/:id/control',auth.hasRole('admin'), function (req,res) {
     var id = req.params.id;
     for (var index = 0; index < robots.length; index++)
         if ( id == robots[index]._id.toString())

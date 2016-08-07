@@ -6,6 +6,7 @@ angular.module('inzApp')
           $scope.robots = response.data;
        });
 
+
         Socket.connect();
 
         Socket.on('connect', function () {
@@ -305,7 +306,7 @@ angular.module('inzApp')
         }
 
 
-        $http.get('/api/robots/' + $stateParams.id).then(function (response) {
+        $http.get('/api/robots/' + $stateParams.id +"/control").then(function (response) {
             $scope.robot = response.data;
             Socket.connect();
         });

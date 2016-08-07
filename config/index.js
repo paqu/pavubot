@@ -18,11 +18,9 @@ var config = {
                 safe: true
             }
         }
-    }
+    },
 
-    /*
-    userRoles = ['quest','user','adimn'];
-    */
+    userRoles : ['quest','user','admin']
 };
 
 module.exports = config;
