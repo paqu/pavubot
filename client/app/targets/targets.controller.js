@@ -6,9 +6,6 @@ angular.module('inzApp')
           $scope.robots = response.data;
        });
 
-
-        Socket.connect();
-
         Socket.on('connect', function () {
             console.log("[on] connect to server");
         });
@@ -41,14 +38,11 @@ angular.module('inzApp')
         Socket.on('disconnect', function() {
             $scope.robots = [];
         });
-
-        $scope.$on('$destroy', function () {
-            Socket.disconnect(true);
-            Socket.removeAllListeners();
-        });
 }])
 
     .controller('RobotCtrl',['$scope','$state', '$http','$document','$timeout', 'Socket', '$stateParams', function ($scope, $state, $http, $document,$timeout, Socket, $stateParams) {
+
+
         var UPDATE_SPEED = "server_user_nsp:update_speed";
         var SERVO_CHANGE = "server_user_nsp:robot_change_servo_angle";
         var ROBOT_MOVE   = "server_user_nsp:robot_move";
@@ -308,14 +302,13 @@ angular.module('inzApp')
 
         $http.get('/api/robots/' + $stateParams.id +"/control").then(function (response) {
             $scope.robot = response.data;
-            Socket.connect();
+            console.log("[emit] server_user_nsp:join_to_robot_chanel:" + $scope.robot.control_socketId);
+            Socket.emit("server_user_nsp:join_to_robot_chanel",{chanel:$scope.robot.control_socketId}); //$scope.robot.control_socketId});
+//            Socket.connect();
         });
-
 
         Socket.on("connect", function () {
             console.log("conneted to server from user interface");
-            console.log("[emit] server_user_nsp:join_to_robot_chanel:" + $scope.robot.control_socketId);
-            Socket.emit("server_user_nsp:join_to_robot_chanel",{chanel:$scope.robot.control_socketId}); //$scope.robot.control_socketId});
         });
 
         Socket.on("user_robot:update_video_socketId", function (data) {
@@ -360,8 +353,7 @@ angular.module('inzApp')
 
         $scope.$on('$destroy', function () {
             console.log("[on] $destroy");
-            Socket.disconnect(true);
-            Socket.removeAllListeners();
+            Socket.emit('server_user_nsp:leave_chanel',{chanel: getRobotId()});
         });
     }])
 ;

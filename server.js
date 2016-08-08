@@ -170,6 +170,11 @@ function userConnection(socket) {
         socket.join(data.chanel);
     });
 
+    socket.on("server_user_nsp:leave_chanel", function(data) {
+        logger("server:leave_chanel:"+ data.chanel);
+        socket.join(data.chanel);
+    });
+
     socket.on("server_user_nsp:update_speed", function(data) {
         logger("[on] server_user_nsp:update_speed");
 
