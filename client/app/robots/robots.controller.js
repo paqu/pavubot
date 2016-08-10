@@ -64,33 +64,42 @@ angular.module('inzApp')
         $scope.isSpeedError;
         $scope.speed_error_msg;
 
-        $scope.go_forward = function () {
+        $scope.go_straight = function () {
             if (!key_down) {
                 key_down = true;
-                console.log("robot go_forwad");
-                setMotorAMode("cw");
-                setMotorBMode("ccw");
-                emitToServerRobotMove();
+                console.log("robot go_straight");
+                Socket.emit("server_user_nsp:go_straight",{robotId:getRobotId()});
             }
         }
 
-        $scope.go_backward = function () {
+        $scope.go_back = function () {
             if (!key_down) {
                 key_down = true;
-                console.log("robot go_backward");
-                setMotorAMode("ccw");
-                setMotorBMode("cw");
-                emitToServerRobotMove();
+                console.log("robot go_back");
+                Socket.emit("server_user_nsp:go_back",{robotId:getRobotId()});
             }
         }
         
 
-        $scope.go_left = function () {
+        $scope.turn_left = function () {
+            if (!key_down) {
+                key_down = true;
                 console.log("robot go_left");
+                Socket.emit("server_user_nsp:turn_left",{robotId:getRobotId()});
+            }
         }
 
-        $scope.go_right = function () {
+        $scope.turn_right = function () {
+            if (!key_down) {
+                key_down = true;
                 console.log("robot go_right");
+                Socket.emit("server_user_nsp:turn_right",{robotId:getRobotId()});
+            }
+        }
+        function robotStop() {
+            key_down = false;
+            console.log('robot stop');
+            Socket.emit("server_user_nsp:stop",{robotId:getRobotId()});
         }
 
         $scope.decrease_dir_angle = function () {
@@ -157,13 +166,6 @@ angular.module('inzApp')
 
 
 
-        function robotStop() {
-            key_down = false;
-            console.log('robot stop');
-            setMotorAMode("stop");
-            setMotorBMode("stop");
-            emitToServerRobotMove();
-        }
         
         function setServoMin() {
             console.log("set servo to min");

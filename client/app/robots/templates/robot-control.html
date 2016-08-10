@@ -6,16 +6,16 @@
               console.log(event.which);
               if (event.which === 79) {
                 $('#up').addClass('btn-info');
-                angular.element($('#robotCtrl')).scope().go_forward();
+                angular.element($('#robotCtrl')).scope().go_straight();
               } else if (event.which === 76) {
                 $('#down').addClass('btn-info');
-                angular.element($('#robotCtrl')).scope().go_backward();
+                angular.element($('#robotCtrl')).scope().go_back();
               } else if (event.which === 75) {
                 $('#left').addClass('btn-info');
-                angular.element($('#robotCtrl')).scope().go_left();
+                angular.element($('#robotCtrl')).scope().turn_left();
               } else if (event.which === 186) {
                 $('#right').addClass('btn-info');
-                angular.element($('#robotCtrl')).scope().go_right();
+                angular.element($('#robotCtrl')).scope().turn_right();
               } else if (event.which === 90) {
                 angular.element($('#robotCtrl')).scope().left_servo_down();
               } else if (event.which === 88) {
@@ -42,8 +42,10 @@
                 angular.element($('#robotCtrl')).scope().stop();
                 $('#down').removeClass('btn-info');
               } else if (event.which === 75) {
+                angular.element($('#robotCtrl')).scope().stop();
                 $('#left').removeClass('btn-info');
               } else if (event.which === 186) {
+                angular.element($('#robotCtrl')).scope().stop();
                 $('#right').removeClass('btn-info');
               } else if (event.which === 90) {
                 angular.element($('#robotCtrl')).scope().change_servo_angle();
