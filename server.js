@@ -57,15 +57,17 @@ function controlConnection (socket) {
     var robot = {dupa:'init'};
     var address_ip = socket.handshake.address;
     var socket_id = socket.id;
+    var watchers = 0;
 
     logger("Control connection from " + address_ip + ", socket id: " + socket_id);
 
     console.log(robots);
     socket.on("server:control:init_data", function (data) {
         logger("[on] server:control:init_data");
-        robot = _.merge({'control_socket_id':socket_id}, data);
-        robot = _.merge({'_id':new ObjectID()}, robot);
-        robot = _.merge({'address_ip':address_ip}, robot);
+        robot = _.merge({"control_socket_id":socket_id}, data);
+        robot = _.merge({"_id":new ObjectID()}, robot);
+        robot = _.merge({"address_ip":address_ip}, robot);
+        robot = _.merge({"watchers":watchers}, robot);
         robots.push(robot);
         logger("Server:control:robot was added to robots list");
         logger("Robot:" + JSON.stringify(robot));
@@ -153,8 +155,8 @@ function videoConnection(socket) {
 
     socket.on("server:video:frame", function (data) {
         logger("[on]:server_video_nsp:frame");
-        logger("[emit]:user_robot:frame");
-        user_nsp.in(socket.id).emit("user_robot:frame",{frame: data.frame});
+        logger("[emit]:user:robot:frame");
+        user_nsp.in(socket.id).emit("user:robot:frame",{frame: data.frame});
     });
 
     socket.on('disconnect', function() {
@@ -277,8 +279,8 @@ function userConnection(socket) {
 
         robots[index].watchers--;
         if (robots[index].watchers == 0) {
-            logger("[emit] video:stop_video, chenel" + data.video_chanel);
-            video_nsp.to(data.video_chanel).emit("video:stop_video");
+            logger("[emit] video::stop_video, chenel" + data.video_chanel);
+            video_nsp.to(data.video_chanel).emit("video::stop_video");
         }
 
 
@@ -297,10 +299,11 @@ function userConnection(socket) {
         }
 
         robots[index].watchers++;
+        console.log(robots[index].watchers);
 
         if (robots[index].watchers == 1) {
             logger("[emit] video:start_video, chenel" + data.video_chanel);
-            video_nsp.to(data.video_chanel).emit("video:start_video");
+            video_nsp.to(data.video_chanel).emit("video::start_video");
         }
 
     });
