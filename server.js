@@ -78,19 +78,20 @@ function controlConnection (socket) {
         console.log(robots[0].control_socket_id);
         console.log(socket_id);
         for (var index = 0; index < robots.length; index++) {
-            if (robots[0].control_socket_id == socket_id)
+            if (robots[index].control_socket_id == socket_id)
                 break;
 
         }
+        console.log(index);
         robots[index].video_socket_id = data.video_socket_id;
-        logger("[emit] user:robots_list:update_video_socket_id");
+        logger("[emit] user:robots_list:update_video_socket_id:" + data.video_socket_id);
         user_nsp.emit("user:robots_list:update_video_socket_id", {
             video_socket_id:robots[index].video_socket_id,
             id:robots[index]._id
         });    
 
-        logger("[emit] user:robot:update_video_socket_id");
-        user_nsp.in(socket.id).emit('user:robot:update_video_socket_id', {
+        logger("[emit] user:robot:update_video_socket_id:" + data.video_socket_id);
+        user_nsp.in(socket_id).emit('user:robot:update_video_socket_id', {
             video_socket_id:robots[index].video_socket_id,
         });    
     });
@@ -144,7 +145,8 @@ function controlConnection (socket) {
 
 function videoConnection(socket) {
     var address_ip = socket.handshake.address;
-    logger("Video connection from " + address_ip + ", socket id: " + socket.id);
+    var socket_id = socket.id
+    logger("Video connection from " + address_ip + ", socket id: " + socket_id);
 
     logger("Send socket id " + socket.id + " to " + address_ip);
     socket.emit('video::video_socket_id', { socket_id:socket.id});
@@ -157,23 +159,26 @@ function videoConnection(socket) {
 
     socket.on('disconnect', function() {
         logger("Video disconnet: " + address_ip + " socket id: " + socket.id); 
+
         for (var index = 0; index < robots.length; index++) {
-            if (robots[index].video_socket_id == socket.id) {
+            if (robots[index].video_socket_id == socket_id) {
                 break;
             }
         }
 
         if (robots[index] !== undefined) {
+            console.log("index:" + index);
             robots[index].video_socket_id = 'no connection';
             robots[index].watchers = 0;
-            logger("[emit] user:robots_list:update_video_socket_id, no connection");
+
+            logger("[emit] user:robots_list:update_video_socket_id:no connection");
             user_nsp.emit("user:robots_list:update_video_socket_id", {
                 video_socket_id:robots[index].video_socket_id,
                 id:robots[index]._id
             });    
 
-            logger("[emit] user:robot:update_video_socket_id, no conection");
-            user_nsp.in(robots[index].control_socked_id).emit("user:robot:update_video_socket_id", {
+            logger("[emit] user:robot:update_video_socket_id:no conection");
+            user_nsp.in(robots[0].control_socket_id).emit("user:robot:update_video_socket_id", {
                 video_socket_id:robots[index].video_socket_id,
         });    
         }
@@ -224,7 +229,7 @@ function userConnection(socket) {
         logger("[on] server_user_nsp:update_speed");
 
         for (var index = 0; index < robots.length; index++) {
-            if (robots[index].control_socked_id  == data.robotId) {
+            if (robots[index].control_socket_id  == data.robotId) {
                 break;
             }
         }
@@ -246,7 +251,7 @@ function userConnection(socket) {
         logger("[on] " + SERVO_CHANGE);
 
         for (var index = 0; index < robots.length; index++) {
-            if (robots[index].control_socked_id  == data.robotId) {
+            if (robots[index].control_socket_id  == data.robotId) {
                 break;
             }
         }

@@ -93,7 +93,20 @@ angular.module("inzApp")
         $scope.isSpeedError;
         $scope.speed_error_msg;
 
+        $scope.isVideoConnected   = isVideoConnected;
+        $scope.update_speed       = updateSpeed; 
+        $scope.stop_video         = stopVideo;
+        $scope.start_video        = startVideo;
+        $scope.stop               = robotStop;
+        $scope.servo_max_left     = setCameraAngleMin;
+        $scope.servo_max_right    = setCameraAngleMax;
+        $scope.servo_center       = setCameraAngleCenter;
+        $scope.left_servo_down    = decreaseCameraAngle;
+        $scope.right_servo_down   = increaseCameraAngle;
+        $scope.change_camera_angle = emitToServerCameraAngleChange;
+
         $scope.go_straight = function () {
+
             if (!key_down) {
                 key_down = true;
                 console.log("robot go_straight");
@@ -109,6 +122,12 @@ angular.module("inzApp")
             }
         }
         
+        function isVideoConnected() {
+            if ($scope.robot.video_socket_id !== "no connection")
+                return 1;
+            else 
+                return 0;
+        }
 
         $scope.turn_left = function () {
             if (!key_down) {
@@ -147,16 +166,6 @@ angular.module("inzApp")
             }
         }
 
-        $scope.update_speed       = updateSpeed; 
-        $scope.stop_video         = stopVideo;
-        $scope.start_video        = startVideo;
-        $scope.stop               = robotStop;
-        $scope.servo_max_left     = setCameraAngleMin;
-        $scope.servo_max_right    = setCameraAngleMax;
-        $scope.servo_center       = setCameraAngleCenter;
-        $scope.left_servo_down    = decreaseCameraAngle;
-        $scope.right_servo_down   = increaseCameraAngle;
-        $scope.change_camera_angle = emitToServerCameraAngleChange;
 
         function updateSpeed() {
             if ((!getRightMotorSpeed()) && (!getLefttMotorSpeed())) {
@@ -313,7 +322,7 @@ angular.module("inzApp")
         });
 
         Socket.on("user:robot:update_video_socket_id", function (data) {
-            console.log("[on] user:robot:update_video_socket_id to: " + data.video_socket_id);
+            console.log("[on] user:robot:update_video_socket_id:" + data.video_socket_id);
             $scope.robot.video_socket_id = data.video_socket_id;
         });
 
