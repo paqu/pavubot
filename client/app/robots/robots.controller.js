@@ -36,6 +36,7 @@ angular.module("inzApp")
             for (var index = 0; index < $scope.robots.length; index++)
                 if (data.id == $scope.robots[index]._id)
                     break;
+
             $scope.robots.splice(index,1);
         });
 
@@ -73,7 +74,7 @@ angular.module("inzApp")
 
 
         var UPDATE_SPEED = "server:user:update_speed";
-        var SERVO_CHANGE = "server:user:robot_change_camera_angle";
+        var SERVO_CHANGE = "server:user:change_camera_angle_to";
         var ROBOT_MOVE   = "server:user:robot_move";
         var STOP_VIDEO   = "server:user:stop_video";
         var START_VIDEO  = "server:user:start_video";
@@ -98,12 +99,14 @@ angular.module("inzApp")
         $scope.stop_video         = stopVideo;
         $scope.start_video        = startVideo;
         $scope.stop               = robotStop;
-        $scope.servo_max_left     = setCameraAngleMin;
-        $scope.servo_max_right    = setCameraAngleMax;
-        $scope.servo_center       = setCameraAngleCenter;
-        $scope.left_servo_down    = decreaseCameraAngle;
-        $scope.right_servo_down   = increaseCameraAngle;
-        $scope.change_camera_angle = emitToServerCameraAngleChange;
+        
+        $scope.getCameraAngle     = getCameraAngle;
+        $scope.cameraAngleMin     = setCameraAngleMin;
+        $scope.cameraAngleMax     = setCameraAngleMax;
+        $scope.cameraAngleCenter  = setCameraAngleCenter;
+        $scope.decCameraAngle     = decreaseCameraAngle;
+        $scope.incCameraAngle     = increaseCameraAngle;
+        $scope.updateCameraAngle  = emitToServerCameraAngleChange;
 
         $scope.go_straight = function () {
 
@@ -248,7 +251,7 @@ angular.module("inzApp")
             console.log("[emit] "+ SERVO_CHANGE + "," + getCameraAngle());
             Socket.emit(SERVO_CHANGE, {
                 camera_angle : getCameraAngle(),
-                robot_id    : getRobotId()
+                robot_id     : getRobotId()
             });
         }
 
@@ -308,7 +311,7 @@ angular.module("inzApp")
         }
 
         function getCameraAngle() {
-            return Number($scope.robot.camera_angle);
+            return $scope.robot.camera_angle;
         }
 
         $http.get('/api/robots/' + $stateParams.id +"/control").then(function (response) {

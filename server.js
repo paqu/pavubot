@@ -246,22 +246,22 @@ function userConnection(socket) {
         });
     });
 
-    var SERVO_CHANGE = "server:user:robot_change_servo_angle";
-    var SERVO_UPDATE = "robot:update_servo_angle";
+    var SERVO_CHANGE = "server:user:change_camera_angle_to";
+    var SERVO_UPDATE = "robot::change_camera_angle_to";
 
     socket.on(SERVO_CHANGE, function(data) {
         logger("[on] " + SERVO_CHANGE);
 
         for (var index = 0; index < robots.length; index++) {
-            if (robots[index].control_socket_id  == data.robotId) {
+            if (robots[index].control_socket_id  == data.robot_id) {
                 break;
             }
         }
-        robots[index].servo.angle = data.servo_angle;
+        robots[index].camera_angle = data.camera_angle;
 
         logger("[emit] "+ SERVO_UPDATE + JSON.stringify(data));
-        control_nsp.to(data.robotId).emit(SERVO_UPDATE, {
-           servo_angle:data.servo_angle,
+        control_nsp.to(data.robot_id).emit(SERVO_UPDATE, {
+           camera_angle:data.camera_angle,
         });
     });
 

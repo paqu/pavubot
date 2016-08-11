@@ -15,20 +15,20 @@
               } else if (event.which === 186) {
                 $('#right').addClass('btn-info');
                 angular.element($('#robotCtrl')).scope().turn_right();
-              } else if (event.which === 90) {
-                angular.element($('#robotCtrl')).scope().left_servo_down();
-              } else if (event.which === 88) {
-                angular.element($('#robotCtrl')).scope().right_servo_down();
               } else if (event.which === 65) {
                 angular.element($('#robotCtrl')).scope().decrease_dir_angle();
               } else if (event.which === 83) {
                 angular.element($('#robotCtrl')).scope().increase_dir_angle();
+              } else if (event.which === 90) {
+                angular.element($('#robotCtrl')).scope().decCameraAngle();
+              } else if (event.which === 88) {
+                angular.element($('#robotCtrl')).scope().incCameraAngle();
               } else if (event.which === 67) {
-                angular.element($('#robotCtrl')).scope().servo_max_left();
+                angular.element($('#robotCtrl')).scope().cameraAngleMin();
               } else if (event.which === 86) {
-                angular.element($('#robotCtrl')).scope().servo_center();
+                angular.element($('#robotCtrl')).scope().cameraAngleCenter();
               } else if (event.which === 66) {
-                angular.element($('#robotCtrl')).scope().servo_max_right();
+                angular.element($('#robotCtrl')).scope().cameraAngleMax();
               }
 
 
@@ -47,9 +47,9 @@
                 angular.element($('#robotCtrl')).scope().stop();
                 $('#right').removeClass('btn-info');
               } else if (event.which === 90) {
-                angular.element($('#robotCtrl')).scope().change_servo_angle();
+                angular.element($('#robotCtrl')).scope().updateCameraAngle();
               } else if (event.which === 88) {
-                angular.element($('#robotCtrl')).scope().change_servo_angle();
+                angular.element($('#robotCtrl')).scope().updateCameraAngle();
               }
             }
           });
@@ -88,15 +88,15 @@
                   </div>
                   <div class="row">
                     <span class="col-xs-1">-90</span>
-                    <span class="col-xs-10 text-center">{{robot.servo.angle}}</span>
+                    <span class="col-xs-10 text-center">{{getCameraAngle()}}</span>
                     <span class="col-xs-1">90</span>
                   </div>
                   <div class="row">
                     <div class="progress progress_clear rightToLeft col-xs-6">
-                      <div class="progress-bar progress-bar-success" role="progressbar" style="width:{{-robot.servo.angle/90 * 100}}%"></div>
+                      <div class="progress-bar progress-bar-success" role="progressbar" style="width:{{-getCameraAngle()/90 * 100}}%"></div>
                     </div>
                     <div class="progress progress_clear col-xs-6">
-                      <div class="progress-bar progress-bar-success" role="progressbar" style="width:{{robot.servo.angle/90 * 100}}%"></div>
+                      <div class="progress-bar progress-bar-success" role="progressbar" style="width:{{getCameraAngle()/90 * 100}}%"></div>
                     </div>
                   </div>
 
