@@ -1,24 +1,37 @@
+<style>
+.robots_list thead th {
+  text-align:center;
+}
+.robots_list tbody td {
+  text-align:center;
+}
+</style>
 <div class="container">
   <div class="row">
     <div class="table-responsive">
       <div ng-show="robots.length" class="ng-hide">
-        <table class="table table-bordered">
+        <table class="table table-bordered robots_list">
           <thead>
-            <th> Id:</th>
-            <th> Nazwa:</th>
-            <th> Control SocketId </th>
-            <th> Video SocketId </th>
+            <th>Lp.</th>
+            <th>Nazwa robota</th>
+            <th>Adres IP </th>
+            <th>Tryb </th>
+            <th>Transmisja obrazu</th>
             <th>  </th>
           </thead>
           <tbody>
             <tr ng-repeat="robot in robots">
-              <td> {{robot._id}} </td>
-              <td> {{robot.name}} </td>
-              <td> {{robot.control_socketId}} </td>
-              <td> {{robot.video_socketId}} </td>
+              <td>{{$index}} </td>
+              <td>{{getRobotName($index)}} </td>
+              <td>{{getRobotAddressIP($index)}} </td>
+              <td>{{getRobotMode($index)}}</td>
               <td>
-                <a class="btn btn-info" ui-sref="target-admin({id:robot._id})"> Steruj </a>
-                <a class="btn btn-warning" ui-sref="target-watcher({id:robot._id})"> Obserwuj </a></td>
+                <i ng-if="isVideoConnected($index)" class="glyphicon glyphicon-ok-sign text-success"></i>
+                <i ng-if="!isVideoConnected($index)"class="glyphicon glyphicon-minus text-danger"></i>
+              </td>
+              <td>
+                <a class="btn btn-info" ui-sref="robot-control({id:robot._id})"> Steruj </a>
+                <a class="btn btn-warning" ui-sref="robot-watcher({id:robot._id})"> Obserwuj </a></td>
             </tr>
           </tbody>
         </table>

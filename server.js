@@ -44,117 +44,137 @@ video_nsp.on('connection', videoConnection);
 user_nsp.on('connection', userConnection);
      
 var robots = [];
-var robot_nr = 0
 
+function createRobot(socket_id, address_ip, data){
+        var robot;
+        robot = _.merge({'control_socket_id':socket_id}, data);
+        robot = _.merge({'_id':new ObjectID()}, robot);
+        robot = _.merge({'address_ip':address_ip}, robot);
+        return robot;
+}
 
 function controlConnection (socket) {
     var robot;
-    var addressIP = socket.handshake.address;
-    var control_socketId = socket.id;
+    var address_ip = socket.handshake.address;
+    var socket_id = socket.id;
+    var watchers = 0;
 
-    logger("Control connection from " + addressIP + ", socket id: " + socket.id);
+    logger("Control connection from " + address_ip + ", socket id: " + socket_id);
 
-    socket.on('server:init', function (data) {
-        robot = _.merge({'control_socketId':control_socketId}, data);
+    console.log(robots);
+    socket.on("server:control:init_data", function (data) {
+        logger("[on] server:control:init_data");
+        robot = _.merge({'control_socket_id':socket_id}, data);
         robot = _.merge({'_id':new ObjectID()}, robot);
-        robot = _.merge({'name':'robot_' + robot_nr}, robot);
-        robot_nr++;
+        robot = _.merge({'address_ip':address_ip}, robot);
+        robot = _.merge({'watchers':watchers}, robot);
         robots.push(robot);
-        logger("Control: robot was added");
+        logger("Server:control:robot was added to robots list");
         logger("Robot:" + JSON.stringify(robot));
-        user_nsp.emit('user:add_robot', {robot:robot});    
+        logger("[emit] user:robots_list:add_robot");
+        user_nsp.emit("user:robots_list:add_robot",{robot:robot});    
     });
 
-    socket.on('server:update_video_socketId', function (data) {
-        logger("Update video socketId " + data.video_socketId);
-        for (var index = 0; index < robots.length; index++)
-            if (robots[index].control_socketId == socket.id)
+    socket.on("server:control:update_video_socket_id", function (data) {
+        logger("[on] server:control:update_video_socket_id" + data.video_socket_id);
+
+        for (var index = 0; index < robots.length; index++) {
+            if (robots[0].control_socket_id == socket_id)
                 break;
+        }
 
-
-        robots[index].video_socketId = data.video_socketId;
-        user_nsp.emit('user:update_video_socketId', {
-            video_socketId:robots[index].video_socketId,
+        robots[index].video_socket_id = data.video_socket_id;
+        logger("[emit] user:robots_list:update_video_socket_id");
+        user_nsp.emit("user:robots_list:update_video_socket_id", {
+            video_socket_id:robots[index].video_socket_id,
             id:robots[index]._id
         });    
-        user_nsp.in(socket.id).emit('user_robot:update_video_socketId', {
-            video_socketId:robots[index].video_socketId,
+
+        logger("[emit] user:robot:update_video_socket_id");
+        user_nsp.in(socket.id).emit('user:robot:update_video_socket_id', {
+            video_socket_id:robots[index].video_socket_id,
         });    
     });
 
-    socket.on('server:update_encoder_distance_a',function (data){
-        logger("Control:[on] server:update_encoder_distance_a: " + JSON.stringify(data));
-        robots[robots.indexOf(robot)].encoder.distance_a = data.encoder_distance_a;
-        logger("Control:[emit] user_robot:update_encoder_distance_a: " + JSON.stringify(data));
-        user_nsp.in(socket.id).emit('user_robot:update_encoder_distance_a',
-                {encoder_distance_a:data.encoder_distance_a});
+    socket.on('server:control:update_right_encoder_distance',function (data){
+        logger("Control:[on] server:update_right_encoder_distance: " + JSON.stringify(data));
+        robots[robots.indexOf(robot)].right_encoder_distance = data.right_encoder_distance;
+        logger("Control:[emit] user_robot:update_right_encoder_distance: " + JSON.stringify(data));
+        user_nsp.in(socket.id).emit('user_robot:update_right_encoder_distance',
+                {right_encoder_distance:data.right_encoder_distance});
     });
 
-    socket.on('server:update_encoder_distance_b',function (data){
-        logger("Control:[on] server:update_encoder_distance_b: " + JSON.stringify(data));
-        robots[robots.indexOf(robot)].encoder.distance_b = data.encoder_distance_b;
-        logger("Control:[emit] user_robot:update_encoder_distance_b: " + JSON.stringify(data));
-        user_nsp.in(socket.id).emit('user_robot:update_encoder_distance_b'
-                ,{encoder_distance_b:data.encoder_distance_b});
+    socket.on('server:control:update_left_encoder_distance',function (data){
+        logger("Control:[on] server:update_left_encoder_distance: " + JSON.stringify(data));
+        robots[robots.indexOf(robot)].left_encoder_distance = data.left_encoder_distance;
+        logger("Control:[emit] user_robot:update_left_encoder_distance: " + JSON.stringify(data));
+        user_nsp.in(socket.id).emit('user_robot:update_left_encoder_distance'
+                ,{left_encoder_distance:data.left_encoder_distance});
     });
 
-    socket.on('server:update_distance_sensor_sonar',function (data){
+    socket.on('server:control:update_distance_sensor_sonar',function (data){
+        console.log(robot);
         logger("Control:[on] server:update_distance_sensor_sonar: " + JSON.stringify(data));
-        robots[robots.indexOf(robot)].distance_sensor.sonar = data.distance_sensor_sonar;
+        robots[robots.indexOf(robot)].distance_sensor_sonar = data.distance_sensor_sonar;
         logger("Control:[emit] user_robot:update_distance_sensor_sonar: " + JSON.stringify(data));
         user_nsp.in(socket.id).emit('user_robot:update_distance_sensor_sonar'
                 ,{distance_sensor_sonar:data.distance_sensor_sonar});
     });
 
-    socket.on('server:update_distance_sensor_infrared',function (data){
+    socket.on("server:control:update_distance_sensor_infrared",function (data){
         logger("Control:[on] server:update_distance_sensor_infrared: " + JSON.stringify(data));
-        robots[robots.indexOf(robot)].distance_sensor.infrared = data.distance_sensor_infrared;
+        robots[robots.indexOf(robot)].distance_sensor_infrared = data.distance_sensor_infrared;
         logger("Control:[emit] user_robot:update_distance_sensor_infrared: " + JSON.stringify(data));
         user_nsp.in(socket.id).emit('user_robot:update_distance_sensor_infrared'
                 ,{distance_sensor_infrared:data.distance_sensor_infrared});
     });
 
-    socket.on('disconnect', function() {
-        logger("Control:disconnet from : " + addressIP + ' socketId:' + socket.id);
-        user_nsp.emit('user:remove_robot', {id:robot._id});
-        robots.splice(robots.indexOf(robot),1);
-        user_nsp.in(socket.id).emit('user_robot:remove_robot');
+    socket.on("disconnect", function() {
+        logger("Control:disconnet from : " + address_ip + " socketId:" + socket.id);
+        
+        if (robot !== undefined) {
+            logger("[emit] user:robots_list:remove_robot");
+            user_nsp.emit("user:robots_list:remove_robot", {id:robot._id});
+            robots.splice(robots.indexOf(robot),1);
+            logger("[emit] user:robot:remove_robot");
+            user_nsp.in(socket_id).emit("user:robot:remove_robot");
+        }
     });
 }
 
 
 
 function videoConnection(socket) {
-    var addressIP = socket.handshake.address;
-    logger("Video connection from " + addressIP + ", socket id: " + socket.id);
+    var address_ip = socket.handshake.address;
+    logger("Video connection from " + address_ip + ", socket id: " + socket.id);
 
-    logger("Send socket id " + socket.id + " to " + addressIP);
-    socket.emit('video:video_socketId', { socketId:socket.id});
+    logger("Send socket id " + socket.id + " to " + address_ip);
+    socket.emit('video::video_socket_id', { socket_id:socket.id});
 
-    socket.on("server_video_nsp:frame", function (data) {
-        logger("[on]:server_video_nsp:frame");
-        logger("[emit]:user_robot:frame");
-        user_nsp.in(socket.id).emit("user_robot:frame",{frame: data.frame});
+    socket.on("server:video:frame", function (data) {
+        logger("[on]:server:video_nsp:frame");
+        logger("[emit]:user:robot:frame");
+        user_nsp.in(socket.id).emit("user:robot:frame",{frame: data.frame});
     });
 
     socket.on('disconnect', function() {
-        logger(" Disconnet: " + addressIP + " socket id: " + socket.id); 
+        logger("Video disconnet: " + address_ip + " socket id: " + socket.id); 
         for (var index = 0; index < robots.length; index++) {
-            if (robots[index].video_socketId == socket.id) {
+            if (robots[index].video_socket_id == socket.id) {
                 break;
             }
         }
 
         if (robots[index] !== undefined) {
-            robots[index].video_socketId = 'no connection';
+            robots[index].video_socket_id = 'no connection';
             robots[index].watchers = 0;
-            user_nsp.emit('user:update_video_socketId', {
-                video_socketId:robots[index].video_socketId,
+            user_nsp.emit('user:robots_list:update_video_socket_id', {
+                video_socket_id:robots[index].video_socket_id,
                 id:robots[index]._id
             });    
-          //  user_nsp.in(socket.id).emit('user_robot:update_video_socketId', {
-            user_nsp.in(robots[index].control_socketId).emit('user_robot:update_video_socketId', {
-                video_socketId:robots[index].video_socketId,
+          //  user_nsp.in(socket.id).emit('user_robot:update_video_socket_id', {
+            user_nsp.in(robots[index].control_socked_id).emit('user:robot:update_video_socket_id', {
+                video_socket_id:robots[index].video_socket_id,
         });    
         }
 
@@ -162,24 +182,49 @@ function videoConnection(socket) {
 }
 
 function userConnection(socket) {
-    var addressIP = socket.handshake.address;
-    logger("User connection from " + addressIP + ", socket id: " + socket.id);
+    var address_ip = socket.handshake.address;
+    logger("User connection from " + address_ip + ", socket id: " + socket.id);
 
-    socket.on("server_user_nsp:join_to_robot_chanel", function(data) {
+    socket.on("server:user:join_to_robot_chanel", function(data) {
         logger("server:join_to_robot_chanel:"+ data.chanel);
         socket.join(data.chanel);
     });
 
-    socket.on("server_user_nsp:leave_chanel", function(data) {
+    socket.on("server:user:leave_chanel", function(data) {
         logger("server:leave_chanel:"+ data.chanel);
         socket.join(data.chanel);
     });
 
-    socket.on("server_user_nsp:update_speed", function(data) {
+    socket.on("server:user:go_straight", function(data) {
+        logger("[on] server_user_nsp:go_straight");
+        control_nsp.to(data.robotId).emit("robot:go_straight", {});
+    });
+
+    socket.on("server:user:go_back", function(data) {
+        logger("[on] server_user_nsp:go_back");
+        control_nsp.to(data.robotId).emit("robot:go_back", {});
+    });
+
+    socket.on("server:user:turn_left", function(data) {
+        logger("[on] server_user_nsp:turn_left");
+        control_nsp.to(data.robotId).emit("robot:turn_left", {});
+    });
+
+    socket.on("server:user:turn_right", function(data) {
+        logger("[on] server_user_nsp:turn_right");
+        control_nsp.to(data.robotId).emit("robot:turn_right", {});
+    });
+
+    socket.on("server:user:stop", function(data) {
+        logger("[on] server_user_nsp:stop");
+        control_nsp.to(data.robotId).emit("robot:stop", {});
+    });
+
+    socket.on("server:user:update_speed", function(data) {
         logger("[on] server_user_nsp:update_speed");
 
         for (var index = 0; index < robots.length; index++) {
-            if (robots[index].control_socketId  == data.robotId) {
+            if (robots[index].control_socked_id  == data.robotId) {
                 break;
             }
         }
@@ -194,14 +239,14 @@ function userConnection(socket) {
         });
     });
 
-    var SERVO_CHANGE = "server_user_nsp:robot_change_servo_angle";
+    var SERVO_CHANGE = "server:user:robot_change_servo_angle";
     var SERVO_UPDATE = "robot:update_servo_angle";
 
     socket.on(SERVO_CHANGE, function(data) {
         logger("[on] " + SERVO_CHANGE);
 
         for (var index = 0; index < robots.length; index++) {
-            if (robots[index].control_socketId  == data.robotId) {
+            if (robots[index].control_socked_id  == data.robotId) {
                 break;
             }
         }
@@ -213,33 +258,35 @@ function userConnection(socket) {
         });
     });
 
-    socket.on("server_user_nsp:stop_video", function (data) {
-        logger("[on] server_user_nsp:stop_video:" + data.video_chanel);
+    socket.on("server:user:stop_video", function (data) {
+        logger("[on] server:user:stop_video" + data.video_chanel);
+
         logger("[leave]" + socket.id + "leave" + data.video_chanel);
         socket.leave(data.video_chanel);
 
         for (var index = 0; index < robots.length; index++) {
-            if (robots[index].video_socketId == data.video_chanel) {
+            if (robots[index].video_socket_id == data.video_chanel) {
                 break;
             }
         }
 
         robots[index].watchers--;
         if (robots[index].watchers == 0) {
-            logger("[emit] video:stop_video, chenel" + data.video_chanel);
-            video_nsp.to(data.video_chanel).emit("video:stop_video");
+            logger("[emit] video::stop_video, chenel" + data.video_chanel);
+            video_nsp.to(data.video_chanel).emit("video::stop_video");
         }
 
 
     });
 
-    socket.on("server_user_nsp:start_video", function (data) {
-        logger("[on] server_user_nsp:start_video" + data.video_chanel);
+    socket.on("server:user:start_video", function (data) {
+        logger("[on] server:user:start_video" + data.video_chanel);
+
         logger("[join]" + socket.id + "join" + data.video_chanel);
         socket.join(data.video_chanel);
 
         for (var index = 0; index < robots.length; index++) {
-            if (robots[index].video_socketId == data.video_chanel) {
+            if (robots[index].video_socket_id == data.video_chanel) {
                 break;
             }
         }
@@ -247,14 +294,14 @@ function userConnection(socket) {
         robots[index].watchers++;
 
         if (robots[index].watchers == 1) {
-            logger("[emit] video:start_video, chenel" + data.video_chanel);
-            video_nsp.to(data.video_chanel).emit("video:start_video");
+            logger("[emit] video::start_video, chenel" + data.video_chanel);
+            video_nsp.to(data.video_chanel).emit("video::start_video");
         }
 
     });
 
    socket.on('disconnect', function() {
-        logger(" Disconnet: " + addressIP + "," + socket.id);
+        logger(" Disconnet: " + address_ip + "," + socket.id);
     });
 }
 
