@@ -21,7 +21,7 @@ angular.module("inzApp")
         });
 
         Socket.on("user:robots_list:update_video_socket_id", function (data) {
-            console.log("[on] user:robots_list:update_video_socket_id" + data.video_socket_id);
+            console.log("[on] user:robots_list:update_video_socket_id:" + data.video_socket_id);
 
             for (var index = 0; index < $scope.robots.length; index++)
                if ($scope.robots[index]._id ==  data.id)
@@ -147,12 +147,6 @@ angular.module("inzApp")
             }
         }
 
-        $scope.isSonar             = isSonar;
-        $scope.isInfrared          = isInfrared;
-        $scope.isVideoConnected    = isVideoConnected;
-        $scope.getDisteSonar       = getDistanceSonar;
-        $scope.getDistanceInfrared = getDistanceInfrared;
-
         $scope.update_speed       = updateSpeed; 
         $scope.stop_video         = stopVideo;
         $scope.start_video        = startVideo;
@@ -163,35 +157,6 @@ angular.module("inzApp")
         $scope.left_servo_down    = decreaseCameraAngle;
         $scope.right_servo_down   = increaseCameraAngle;
         $scope.change_camera_angle = emitToServerCameraAngleChange;
-
-        function getDistanceSonar() {
-            return $scope.robot.distance_sensor_sonar;
-        }
-
-        function getDistanceInfrared() {
-            return $scope.robot.distance_sensor_infrared;
-        }
-
-        function isSonar(){
-            if ($scope.distance_sensor == "sonar")
-                    return 1;
-            else return 0;
-        }
-
-        function isInfrared(){
-            if ($scope.distance_sensor == "infrared")
-                    return 1;
-            else return 0;
-        }
-
-        function isVideoConnected() {
-            if ($scope.robot.video_socket_id !== "no connection"
-             && $scope.robot.video_socket_id !== "")
-                return 1;
-            else 
-                return 0;
-        }
-
 
         function updateSpeed() {
             if ((!getRightMotorSpeed()) && (!getLefttMotorSpeed())) {
@@ -348,30 +313,28 @@ angular.module("inzApp")
         });
 
         Socket.on("user:robot:update_video_socket_id", function (data) {
-            console.log("[on] robot:user:update_video_socket_id to " + data.video_socket_id);
+            console.log("[on] user:robot:update_video_socket_id to: " + data.video_socket_id);
             $scope.robot.video_socket_id = data.video_socket_id;
         });
 
         Socket.on("user:robot:update_right_encoder_distance",function (data){
-            console.log('[on] robot:user:update_right_encoder_distance' + JSON.stringify(data));
+            console.log('[on] user:robot:update_right_encoder_distance' + JSON.stringify(data));
             $scope.robot.right_encoder_distance = data.right_encoder_distance;
         });
 
         Socket.on("user:robot:update_left_encoder_distance",function (data){
-            console.log('[on] robot:user:update_left_encoder_distance' + JSON.stringify(data));
+            console.log('[on] user:robot:update_left_encoder_distance' + JSON.stringify(data));
             $scope.robot.left_encoder_distance = data.left_encoder_distance;
         });
 
         Socket.on("user:robot:update_distance_sensor_sonar",function (data){
-            console.log('[on] robot:user:update_distance_sensor_sonar' + JSON.stringify(data));
+            console.log('[on] user:robot:update_distance_sensor_sonar' + JSON.stringify(data));
             $scope.robot.distance_sensor_sonar = data.distance_sensor_sonar;
-            updateView();
         });
 
         Socket.on("user:robot:update_distance_sensor_infrared",function (data){
-            console.log('[on] robot:user:update_distance_sensor_infrared' + JSON.stringify(data));
+            console.log('[on] user:robot:update_distance_sensor_infrared' + JSON.stringify(data));
             $scope.robot.distance_sensor_infrared = data.distance_sensor_infrared;
-            updateView();
         });
 
         Socket.on("user:robot:remove_robot", function () {
@@ -381,7 +344,7 @@ angular.module("inzApp")
         });
         
         Socket.on("user:robot:frame", function (data) {
-            console.log("[on]:robot:user:frame");
+            console.log("[on]:user:robot:frame");
             var uint8Arr = new Uint8Array(data.frame);
             var str = String.fromCharCode.apply(null, uint8Arr);
             var base64String = btoa(str);
