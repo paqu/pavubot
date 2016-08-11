@@ -166,12 +166,14 @@ function videoConnection(socket) {
         if (robots[index] !== undefined) {
             robots[index].video_socket_id = 'no connection';
             robots[index].watchers = 0;
-            user_nsp.emit('user:robot_listupdate_video_socket_id', {
+            logger("[emit] user:robots_list:update_video_socket_id, no connection");
+            user_nsp.emit("user:robots_list:update_video_socket_id", {
                 video_socket_id:robots[index].video_socket_id,
                 id:robots[index]._id
             });    
-          //  user_nsp.in(socket.id).emit('user_robot:update_video_socket_id', {
-            user_nsp.in(robots[index].control_socked_id).emit('user_robot:update_video_socket_id', {
+
+            logger("[emit] user:robot:update_video_socket_id, no conection");
+            user_nsp.in(robots[index].control_socked_id).emit("user:robot:update_video_socket_id", {
                 video_socket_id:robots[index].video_socket_id,
         });    
         }
