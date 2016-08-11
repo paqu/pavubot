@@ -149,15 +149,15 @@
           <div class="panel-heading text-center">Konfiguracja</div>
             <div class="panel-body">
               <div class="col-xs-12 col-md-4">
-                <form name="update_speed_form" novalidate class="form-horizontal" ng-submit="update_speed()">
+                <form name="update_speed_form" novalidate class="form-horizontal" ng-submit="updateSpeed()">
                   <h3 class="config-header">Silnik</h3>
                   <div class="input-group input-group-sm" style="margin-top:20px;margin-bottom:20px">
                     <span class="input-group-addon" id="sizing-addon3">Lewy</span>
-                    <input class="form-control" placeholder="predkość [0-100]" ng-pattern="/^([0-9]|[1-9][0-9]|100)$/" ng-model="robot.motor.motor_a_speed" required>
+                    <input class="form-control" placeholder="predkość [0-100]" ng-pattern="/^([0-9]|[1-9][0-9]|100)$/" ng-model="robot.left_motor_speed" required>
                   </div>
                   <div class="input-group input-group-sm">
                     <span class="input-group-addon" id="sizing-addon3">Prawy</span>
-                    <input  class="form-control" placeholder="predkość [0-100]" ng-pattern="/^([0-9]|[1-9][0-9]|100)$/" ng-model="robot.motor.motor_b_speed" required>
+                    <input  class="form-control" placeholder="predkość [0-100]" ng-pattern="/^([0-9]|[1-9][0-9]|100)$/" ng-model="robot.right_motor_speed" required>
                   </div>
                   <br>
                   <div class="alert alert-danger" ng-show="isSpeedError">

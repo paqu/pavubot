@@ -73,7 +73,7 @@ angular.module("inzApp")
     .controller('RobotCtrl',['$scope','$state', '$http','$document','$timeout', 'Socket', '$stateParams', function ($scope, $state, $http, $document,$timeout, Socket, $stateParams) {
 
 
-        var UPDATE_SPEED = "server:user:update_speed";
+        var UPDATE_SPEED = "server:user:update_speed_both";
         var SERVO_CHANGE = "server:user:change_camera_angle_to";
         var ROBOT_MOVE   = "server:user:robot_move";
         var STOP_VIDEO   = "server:user:stop_video";
@@ -94,8 +94,10 @@ angular.module("inzApp")
         $scope.isSpeedError;
         $scope.speed_error_msg;
 
+
+        $scope.updateSpeed        = updateSpeed; 
+
         $scope.isVideoConnected   = isVideoConnected;
-        $scope.update_speed       = updateSpeed; 
         $scope.stop_video         = stopVideo;
         $scope.start_video        = startVideo;
         $scope.stop               = robotStop;
@@ -171,17 +173,17 @@ angular.module("inzApp")
 
 
         function updateSpeed() {
-            if ((!getRightMotorSpeed()) && (!getLefttMotorSpeed())) {
+            if ((!getRightMotorSpeed()) && (!getLeftMotorSpeed())) {
                 setSpeedError(LEFT_RIGHT_SPEED_ERR_MSG);
                 return;
             }
 
-            if (!getRightMotorSpeed()) {
+            if (!getLeftMotorSpeed()) {
                 setSpeedError(LEFT_SPEED_ERR_MSG);
                 return;
             }
 
-            if (!getLefttMotorSpeed()) {
+            if (!getRightMotorSpeed()) {
                 setSpeedError(RIGHT_SPEED_ERR_MSG);
                 return;
             }
@@ -260,7 +262,7 @@ angular.module("inzApp")
                 console.log("[emit] " + UPDATE_SPEED + "," + getRobotId());
                 Socket.emit(UPDATE_SPEED, {
                     right_motor_speed : getRightMotorSpeed(),
-                    left_motor_speed  : getLefttMotorSpeed(),
+                    left_motor_speed  : getLeftMotorSpeed(),
                     robot_id          : getRobotId()
                 });
         }

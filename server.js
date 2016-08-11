@@ -204,45 +204,45 @@ function userConnection(socket) {
 
     socket.on("server:user:go_straight", function(data) {
         logger("[on] server_user_nsp:go_straight");
-        control_nsp.to(data.robotId).emit("robot:go_straight", {});
+        control_nsp.to(data.robot_id).emit("robot:go_straight", {});
     });
 
     socket.on("server:user:go_back", function(data) {
         logger("[on] server_user_nsp:go_back");
-        control_nsp.to(data.robotId).emit("robot:go_back", {});
+        control_nsp.to(data.robot_id).emit("robot:go_back", {});
     });
 
     socket.on("server:user:turn_left", function(data) {
         logger("[on] server_user_nsp:turn_left");
-        control_nsp.to(data.robotId).emit("robot:turn_left", {});
+        control_nsp.to(data.robot_id).emit("robot:turn_left", {});
     });
 
     socket.on("server:user:turn_right", function(data) {
         logger("[on] server_user_nsp:turn_right");
-        control_nsp.to(data.robotId).emit("robot:turn_right", {});
+        control_nsp.to(data.robot_id).emit("robot:turn_right", {});
     });
 
     socket.on("server:user:stop", function(data) {
         logger("[on] server_user_nsp:stop");
-        control_nsp.to(data.robotId).emit("robot:stop", {});
+        control_nsp.to(data.robot_id).emit("robot:stop", {});
     });
 
-    socket.on("server:user:update_speed", function(data) {
-        logger("[on] server_user_nsp:update_speed");
+    socket.on("server:user:update_speed_both", function(data) {
+        logger("[on] server:usern:update_speed_both");
 
         for (var index = 0; index < robots.length; index++) {
-            if (robots[index].control_socket_id  == data.robotId) {
+            if (robots[index].control_socket_id  == data.robot_id) {
                 break;
             }
         }
-        robots[index].motor.motor_a_speed = data.motor_a_speed;
-        robots[index].motor.motor_b_speed = data.motor_b_speed;
+        robots[index].right_motor_speed = data.right_motor_speed;
+        robots[index].left_motor_speed  = data.left_motor_speed;
 
-        logger("[emit] robot:update_speed:" + JSON.stringify(data));
+        logger("[emit] robot::update_speed_both:" + JSON.stringify(data));
 
-        control_nsp.to(data.robotId).emit('robot:update_speed', {
-           motor_a_speed:data.motor_a_speed,
-           motor_b_speed:data.motor_b_speed
+        control_nsp.to(data.robot_id).emit('robot::update_speed_both', {
+            right_motor_speed : data.right_motor_speed,
+            left_motor_speed  : data.left_motor_speed
         });
     });
 
