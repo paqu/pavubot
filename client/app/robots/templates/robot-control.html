@@ -5,20 +5,20 @@
             keydown:function (event) {
               if (event.which === 79) {
                 $('#up').addClass('btn-info');
-                angular.element($('#robotCtrl')).scope().go_straight();
+                angular.element($('#robotCtrl')).scope().goStraight();
               } else if (event.which === 76) {
                 $('#down').addClass('btn-info');
-                angular.element($('#robotCtrl')).scope().go_back();
+                angular.element($('#robotCtrl')).scope().goBack();
               } else if (event.which === 75) {
                 $('#left').addClass('btn-info');
-                angular.element($('#robotCtrl')).scope().turn_left();
+                angular.element($('#robotCtrl')).scope().turnLeft();
               } else if (event.which === 186) {
                 $('#right').addClass('btn-info');
-                angular.element($('#robotCtrl')).scope().turn_right();
+                angular.element($('#robotCtrl')).scope().turnRight();
               } else if (event.which === 65) {
-                angular.element($('#robotCtrl')).scope().decrease_dir_angle();
+                angular.element($('#robotCtrl')).scope().decTurnAngle();
               } else if (event.which === 83) {
-                angular.element($('#robotCtrl')).scope().increase_dir_angle();
+                angular.element($('#robotCtrl')).scope().incTurnAngle();
               } else if (event.which === 90) {
                 angular.element($('#robotCtrl')).scope().decCameraAngle();
               } else if (event.which === 88) {
@@ -35,16 +35,16 @@
             },
             keyup:function (event) {   
               if (event.which === 79) {
-                angular.element($('#robotCtrl')).scope().stop();
+                angular.element($('#robotCtrl')).scope().robotStop();
                 $('#up').removeClass('btn-info');
               } else if (event.which === 76) {
-                angular.element($('#robotCtrl')).scope().stop();
+                angular.element($('#robotCtrl')).scope().robotStop();
                 $('#down').removeClass('btn-info');
               } else if (event.which === 75) {
-                angular.element($('#robotCtrl')).scope().stop();
+                angular.element($('#robotCtrl')).scope().robotStop();
                 $('#left').removeClass('btn-info');
               } else if (event.which === 186) {
-                angular.element($('#robotCtrl')).scope().stop();
+                angular.element($('#robotCtrl')).scope().robotStop();
                 $('#right').removeClass('btn-info');
               } else if (event.which === 90) {
                 angular.element($('#robotCtrl')).scope().updateCameraAngle();

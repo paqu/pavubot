@@ -203,32 +203,32 @@ function userConnection(socket) {
     });
 
     socket.on("server:user:go_straight", function(data) {
-        logger("[on] server_user_nsp:go_straight");
+        logger("[on] server:user:go_straight");
         control_nsp.to(data.robot_id).emit("robot:go_straight", {});
     });
 
     socket.on("server:user:go_back", function(data) {
-        logger("[on] server_user_nsp:go_back");
-        control_nsp.to(data.robot_id).emit("robot:go_back", {});
+        logger("[on] server:user:go_back");
+        control_nsp.to(data.robot_id).emit("robot::go_back", {});
     });
 
     socket.on("server:user:turn_left", function(data) {
-        logger("[on] server_user_nsp:turn_left");
-        control_nsp.to(data.robot_id).emit("robot:turn_left", {});
+        logger("[on] server:user:turn_left");
+        control_nsp.to(data.robot_id).emit("robot::turn_left", {});
     });
 
     socket.on("server:user:turn_right", function(data) {
-        logger("[on] server_user_nsp:turn_right");
-        control_nsp.to(data.robot_id).emit("robot:turn_right", {});
+        logger("[on] server:user:turn_right");
+        control_nsp.to(data.robot_id).emit("robot::turn_right", {});
     });
 
     socket.on("server:user:stop", function(data) {
-        logger("[on] server_user_nsp:stop");
-        control_nsp.to(data.robot_id).emit("robot:stop", {});
+        logger("[on] server:user:stop");
+        control_nsp.to(data.robot_id).emit("robot::stop", {});
     });
 
     socket.on("server:user:update_speed_both", function(data) {
-        logger("[on] server:usern:update_speed_both");
+        logger("[on] server:user:update_speed_both");
 
         for (var index = 0; index < robots.length; index++) {
             if (robots[index].control_socket_id  == data.robot_id) {

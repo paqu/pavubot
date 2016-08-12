@@ -107,7 +107,6 @@ angular.module("inzApp")
         $scope.isVideoConnected   = isVideoConnected;
         $scope.stop_video         = stopVideo;
         $scope.start_video        = startVideo;
-        $scope.stop               = robotStop;
         
         $scope.getCameraAngle     = getCameraAngle;
         $scope.cameraAngleMin     = setCameraAngleMin;
@@ -116,6 +115,14 @@ angular.module("inzApp")
         $scope.decCameraAngle     = decreaseCameraAngle;
         $scope.incCameraAngle     = increaseCameraAngle;
         $scope.updateCameraAngle  = emitToServerCameraAngleChange;
+
+        $scope.robotStop    = robotStop;
+        $scope.goStraight   = goStraight;
+        $scope.goBack       = goBack;
+        $scope.turnLeft     = turnLeft;
+        $scope.turnRight    = turnRight;
+        $scope.decTurnAngle = decTurnAngle;
+        $scope.incTurnAngle = incTurnAngle;
 
         function isSonar() {
             if ($scope.distance_sensor == "sonar")
@@ -138,23 +145,6 @@ angular.module("inzApp")
         function getDistanceSensorInfrared() {
             return $scope.robot.distance_sensor_infrared;
         }
-
-        $scope.go_straight = function () {
-
-            if (!key_down) {
-                key_down = true;
-                console.log("robot go_straight");
-                Socket.emit("server:user:go_straight",{robot_id:getRobotId()});
-            }
-        }
-
-        $scope.go_back = function () {
-            if (!key_down) {
-                key_down = true;
-                console.log("robot go_back");
-                Socket.emit("server:user:go_back",{robot_id:getRobotId()});
-            }
-        }
         
         function isVideoConnected() {
             if ($scope.robot.video_socket_id !== "no connection")
@@ -162,8 +152,24 @@ angular.module("inzApp")
             else 
                 return 0;
         }
+        
+        function goStraight() {
+            if (!key_down) {
+                key_down = true;
+                console.log("robot go_straight");
+                Socket.emit("server:user:go_straight",{robot_id:getRobotId()});
+            }
+        }
 
-        $scope.turn_left = function () {
+        function goBack() {
+            if (!key_down) {
+                key_down = true;
+                console.log("robot go_back");
+                Socket.emit("server:user:go_back",{robot_id:getRobotId()});
+            }
+        }
+        
+        function turnLeft() {
             if (!key_down) {
                 key_down = true;
                 console.log("robot go_left");
@@ -171,20 +177,21 @@ angular.module("inzApp")
             }
         }
 
-        $scope.turn_right = function () {
+        function turnRight() {
             if (!key_down) {
                 key_down = true;
                 console.log("robot go_right");
                 Socket.emit("server:user:turn_right",{robot_id:getRobotId()});
             }
         }
+
         function robotStop() {
             key_down = false;
             console.log('robot stop');
             Socket.emit("server:user:stop",{robot_id:getRobotId()});
         }
 
-        $scope.decrease_dir_angle = function () {
+        function decTurnAngle() {
             if ($scope.change_direction_by > 0) {
                 console.log("decrease direction angle");
                 $scope.change_direction_by -= 1;
@@ -192,7 +199,7 @@ angular.module("inzApp")
             }
         }
 
-        $scope.increase_dir_angle = function () {
+        function incTurnAngle() {
             if ($scope.change_direction_by < 180) {
                 console.log("increase direction angle");
                 $scope.change_direction_by += 1;
