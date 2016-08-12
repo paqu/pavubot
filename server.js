@@ -98,20 +98,20 @@ function controlConnection (socket) {
         });    
     });
 
-    socket.on('server:control:update_encoder_distance_a',function (data){
-        logger("Control:[on] server:update_encoder_distance_a: " + JSON.stringify(data));
-        robots[robots.indexOf(robot)].encoder.distance_a = data.encoder_distance_a;
-        logger("Control:[emit] user_robot:update_encoder_distance_a: " + JSON.stringify(data));
-        user_nsp.in(socket.id).emit('user_robot:update_encoder_distance_a',
-                {encoder_distance_a:data.encoder_distance_a});
+    socket.on("server:control:update_left_encoder_distance",function (data){
+        logger("[on] server:control:update_left_encoder_distance: " + JSON.stringify(data));
+        robots[robots.indexOf(robot)].left_encoder_disatnce = data.left_encoder_distance;
+        logger("[emit] user:robot:update_left_encoder_distance: " + JSON.stringify(data));
+        user_nsp.in(socket_id).emit("user:robot:update_left_encoder_distance",
+                {left_encoder_distance:data.left_encoder_distance});
     });
-
-    socket.on('server:control:update_encoder_distance_b',function (data){
-        logger("Control:[on] server:update_encoder_distance_b: " + JSON.stringify(data));
-        robots[robots.indexOf(robot)].encoder.distance_b = data.encoder_distance_b;
-        logger("Control:[emit] user_robot:update_encoder_distance_b: " + JSON.stringify(data));
-        user_nsp.in(socket.id).emit('user_robot:update_encoder_distance_b'
-                ,{encoder_distance_b:data.encoder_distance_b});
+   
+    socket.on("server:control:update_right_encoder_distance",function (data){
+        logger("[on] server:control:update_right_encoder_distance: " + JSON.stringify(data));
+        robots[robots.indexOf(robot)].right_encoder_disatnce = data.right_encoder_distance;
+        logger("[emit] user:robot:update_right_encoder_distance: " + JSON.stringify(data));
+        user_nsp.in(socket_id).emit("user:robot:update_right_encoder_distance",
+                {right_encoder_distance:data.right_encoder_distance});
     });
 
     socket.on("server:control:update_distance_sensor_sonar",function (data){

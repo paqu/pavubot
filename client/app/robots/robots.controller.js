@@ -101,6 +101,9 @@ angular.module("inzApp")
 
         $scope.updateSpeed        = updateSpeed; 
 
+        $scope.getLeftEncoder     = getLeftEncoder;
+        $scope.getRightEncoder    = getRightEncoder;
+
         $scope.isVideoConnected   = isVideoConnected;
         $scope.stop_video         = stopVideo;
         $scope.start_video        = startVideo;
@@ -218,6 +221,14 @@ angular.module("inzApp")
             emitToServerUpdateSpeed();
         }
 
+        function getLeftEncoder() {
+            return $scope.robot.left_encoder_distance;
+        }
+
+        function getRightEncoder() {
+            return $scope.robot.right_encoder_distance;
+        }
+
         function stopVideo() {
             if (isStart) {
                 isStart = false;
@@ -251,7 +262,7 @@ angular.module("inzApp")
         function setCameraAngleCenter() {
             console.log("set servo to center");
             setCameraAngle(0);
-            updateView();
+            updateView();right_encoder_distance
             emitToServerCameraAngleChange();
         }
         
