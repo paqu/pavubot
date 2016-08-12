@@ -114,19 +114,19 @@ function controlConnection (socket) {
                 ,{encoder_distance_b:data.encoder_distance_b});
     });
 
-    socket.on('server:control:update_distance_sensor_sonar',function (data){
+    socket.on("server:control:update_distance_sensor_sonar",function (data){
         logger("Control:[on] server:update_distance_sensor_sonar: " + JSON.stringify(data));
-        robots[robots.indexOf(robot)].distance_sensor.sonar = data.distance_sensor_sonar;
+        robots[robots.indexOf(robot)].distance_sensor_sonar = data.distance_sensor_sonar;
         logger("Control:[emit] user_robot:update_distance_sensor_sonar: " + JSON.stringify(data));
-        user_nsp.in(socket.id).emit('user_robot:update_distance_sensor_sonar'
+        user_nsp.in(socket_id).emit("user:robot:update_distance_sensor_sonar"
                 ,{distance_sensor_sonar:data.distance_sensor_sonar});
     });
 
-    socket.on('server:control:update_distance_sensor_infrared',function (data){
+    socket.on("server:control:update_distance_sensor_infrared",function (data){
         logger("Control:[on] server:update_distance_sensor_infrared: " + JSON.stringify(data));
-        robots[robots.indexOf(robot)].distance_sensor.infrared = data.distance_sensor_infrared;
+        robots[robots.indexOf(robot)].distance_sensor_infrared = data.distance_sensor_infrared;
         logger("Control:[emit] user_robot:update_distance_sensor_infrared: " + JSON.stringify(data));
-        user_nsp.in(socket.id).emit('user_robot:update_distance_sensor_infrared'
+        user_nsp.in(socket_id).emit("user:robot:update_distance_sensor_infrared"
                 ,{distance_sensor_infrared:data.distance_sensor_infrared});
     });
 

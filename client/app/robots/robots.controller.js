@@ -90,10 +90,14 @@ angular.module("inzApp")
 
         $scope.robot = {};
         $scope.change_direction_by = 90;
-        $scope.distance_sensor = 'sonar';
+        $scope.distance_sensor = "infrared";
         $scope.isSpeedError;
         $scope.speed_error_msg;
 
+        $scope.isSonar   = isSonar;
+        $scope.isInfrared = isInfrared;
+        $scope.getDistanceSensorSonar    = getDistanceSensorSonar;
+        $scope.getDistanceSensorInfrared = getDistanceSensorInfrared;
 
         $scope.updateSpeed        = updateSpeed; 
 
@@ -109,6 +113,28 @@ angular.module("inzApp")
         $scope.decCameraAngle     = decreaseCameraAngle;
         $scope.incCameraAngle     = increaseCameraAngle;
         $scope.updateCameraAngle  = emitToServerCameraAngleChange;
+
+        function isSonar() {
+            if ($scope.distance_sensor == "sonar")
+                return true;
+            else
+                return false;
+        }
+
+        function isInfrared() {
+            if ($scope.distance_sensor == "infrared")
+                return true;
+            else
+                return false;
+        }
+
+        function getDistanceSensorSonar() {
+            return $scope.robot.distance_sensor_sonar;
+        }
+
+        function getDistanceSensorInfrared() {
+            return $scope.robot.distance_sensor_infrared;
+        }
 
         $scope.go_straight = function () {
 
