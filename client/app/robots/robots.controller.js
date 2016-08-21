@@ -70,7 +70,7 @@ angular.module("inzApp")
 
 }])
 
-    .controller('RobotCtrl',['$scope','$state', '$http','$document','$timeout', 'Socket', '$stateParams', function ($scope, $state, $http, $document,$timeout, Socket, $stateParams) {
+    .controller('RobotCtrl',['$scope','$state', '$http','$document','$timeout', 'Socket','VideoSocket', '$stateParams', function ($scope, $state, $http, $document,$timeout, Socket, VideoSocket, $stateParams) {
 
 
         var UPDATE_SPEED = "server:user:update_speed_both";
@@ -313,7 +313,7 @@ angular.module("inzApp")
 
         function emitToServerStopVideo() {
                 console.log("[emit]:"+ STOP_VIDEO + "," + getRobotVideoId());
-                Socket.emit(STOP_VIDEO,{
+                VideoSocket.emit(STOP_VIDEO,{
                     video_chanel:getRobotVideoId()
                 });
 
@@ -321,7 +321,7 @@ angular.module("inzApp")
 
         function emitToServerStartVideo() {
                 console.log("[emit]:"+ START_VIDEO + "," + getRobotVideoId());
-                Socket.emit(START_VIDEO,{
+                VideoSocket.emit(START_VIDEO,{
                     video_chanel:getRobotVideoId()
                 });
         }
@@ -401,7 +401,7 @@ angular.module("inzApp")
             $state.go('robots');
         });
         
-        Socket.on("user:robot:frame", function (data) {
+        VideoSocket.on("user:robot:frame", function (data) {
             console.log("[on]:user:robot:frame");
             var uint8Arr = new Uint8Array(data.frame);
             var str = String.fromCharCode.apply(null, uint8Arr);
