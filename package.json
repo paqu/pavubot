@@ -30,6 +30,7 @@
     "mongodb": "^2.1.18",
     "mongoose": "^4.5.8",
     "morgan": "^1.7.0",
+    "opencv": "git+https://github.com/peterbraden/node-opencv.git",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "simple-logger": "git+https://github.com/paqu/simple-logger.git",

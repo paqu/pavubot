@@ -1,9 +1,10 @@
 var _               = require('lodash');
+var cv              = require('opencv');
 var path            = require('path'); /* config/index.js */
 var logger          = require('simple-logger');
 var ObjectID        = require('mongodb').ObjectID;
 var socketio_server = require('socket.io');
-var http            = require('http'); 
+var http            = require('http');
 var app             = require('./app');
 var config          = require('./config');
 var auth            = require('./auth/auth.service');
@@ -42,7 +43,7 @@ var user_nsp    = io.of('/user');
 control_nsp.on('connection', controlConnection);
 video_nsp.on('connection', videoConnection);
 user_nsp.on('connection', userConnection);
-     
+
 var robots = [];
 
 function createRobot(socket_id, address_ip, data){
@@ -72,7 +73,7 @@ function controlConnection (socket) {
         logger("Server:control:robot was added to robots list");
         logger("Robot:" + JSON.stringify(robot));
         logger("[emit] user:robots_list:add_robot");
-        user_nsp.emit("user:robots_list:add_robot",{robot:robot});    
+        user_nsp.emit("user:robots_list:add_robot",{robot:robot});
     });
 
     socket.on("server:control:update_video_socket_id", function (data) {
@@ -90,12 +91,12 @@ function controlConnection (socket) {
         user_nsp.emit("user:robots_list:update_video_socket_id", {
             video_socket_id:robots[index].video_socket_id,
             id:robots[index]._id
-        });    
+        });
 
         logger("[emit] user:robot:update_video_socket_id:" + data.video_socket_id);
         user_nsp.in(socket_id).emit('user:robot:update_video_socket_id', {
             video_socket_id:robots[index].video_socket_id,
-        });    
+        });
     });
 
     socket.on("server:control:update_left_encoder_distance",function (data){
@@ -105,7 +106,7 @@ function controlConnection (socket) {
         user_nsp.in(socket_id).emit("user:robot:update_left_encoder_distance",
                 {left_encoder_distance:data.left_encoder_distance});
     });
-   
+
     socket.on("server:control:update_right_encoder_distance",function (data){
         logger("[on] server:control:update_right_encoder_distance: " + JSON.stringify(data));
         robots[robots.indexOf(robot)].right_encoder_disatnce = data.right_encoder_distance;
@@ -132,7 +133,7 @@ function controlConnection (socket) {
 
     socket.on("disconnect", function() {
         logger("Control:disconnet from : " + address_ip + " socketId:" + socket.id);
-        
+
         if (robot !== undefined) {
             logger("[emit] user:robots_list:remove_robot, id:" + robot._id);
             user_nsp.emit("user:robots_list:remove_robot", {id:robot._id});
@@ -153,14 +154,67 @@ function videoConnection(socket) {
     logger("Send socket id " + socket.id + " to " + address_ip);
     socket.emit('video::video_socket_id', { socket_id:socket.id});
 
+    socket.on("server:video:face", function (data) {
+        logger("[on]:server:video:face");
+
+        logger("[save]:save photo ");
+        cv.readImage(data.face, function (err,im) {
+            if (err) throw err;
+            im.save('photo.jpg');
+        });
+    });
+
     socket.on("server:video:frame", function (data) {
         logger("[on]:server_video_nsp:frame");
         logger("[emit]:user:robot:frame");
-        user_nsp.in(socket.id).emit("user:robot:frame",{frame: data.frame});
+        video_nsp.in(socket.id).emit("user:robot:frame",{frame: data.frame});
+    });
+
+    socket.on("server:user:stop_video", function (data) {
+        logger("[on] server:user:stop_video" + data.video_chanel);
+
+        logger("[leave]" + socket.id + "leave" + data.video_chanel);
+        socket.leave(data.video_chanel);
+
+        for (var index = 0; index < robots.length; index++) {
+            if (robots[index].video_socket_id == data.video_chanel) {
+                break;
+            }
+        }
+
+        robots[index].watchers--;
+        if (robots[index].watchers == 0) {
+            logger("[emit] video::stop_video, chenel" + data.video_chanel);
+            video_nsp.to(data.video_chanel).emit("video::stop_video");
+        }
+
+
+    });
+
+    socket.on("server:user:start_video", function (data) {
+        logger("[on] server:user:start_video" + data.video_chanel);
+
+        logger("[join]" + socket.id + "join" + data.video_chanel);
+        socket.join(data.video_chanel);
+
+        for (var index = 0; index < robots.length; index++) {
+            if (robots[index].video_socket_id == data.video_chanel) {
+                break;
+            }
+        }
+
+        robots[index].watchers++;
+        console.log(robots[index].watchers);
+
+        if (robots[index].watchers == 1) {
+            logger("[emit] video:start_video, chenel" + data.video_chanel);
+            video_nsp.to(data.video_chanel).emit("video::start_video");
+        }
+
     });
 
     socket.on('disconnect', function() {
-        logger("Video disconnet: " + address_ip + " socket id: " + socket.id); 
+        logger("Video disconnet: " + address_ip + " socket id: " + socket.id);
 
         for (var index = 0; index < robots.length; index++) {
             if (robots[index].video_socket_id == socket_id) {
@@ -177,12 +231,12 @@ function videoConnection(socket) {
             user_nsp.emit("user:robots_list:update_video_socket_id", {
                 video_socket_id:robots[index].video_socket_id,
                 id:robots[index]._id
-            });    
+            });
 
             logger("[emit] user:robot:update_video_socket_id:no conection");
             user_nsp.in(robots[0].control_socket_id).emit("user:robot:update_video_socket_id", {
                 video_socket_id:robots[index].video_socket_id,
-        });    
+        });
         }
 
     });
@@ -264,7 +318,7 @@ function userConnection(socket) {
            camera_angle:data.camera_angle,
         });
     });
-
+/*
     socket.on("server:user:stop_video", function (data) {
         logger("[on] server:user:stop_video" + data.video_chanel);
 
@@ -307,6 +361,7 @@ function userConnection(socket) {
         }
 
     });
+    */
 
    socket.on('disconnect', function() {
         logger(" Disconnet: " + address_ip + "," + socket.id);
