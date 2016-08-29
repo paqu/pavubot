@@ -157,10 +157,15 @@ function videoConnection(socket) {
     socket.on("server:video:face", function (data) {
         logger("[on]:server:video:face");
 
+        date = new Date();
+
+        day  = date.getDate() + '-' + date.getMonth() + 1 + '-' + date.getFullYear()
+        time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+
         logger("[save]:save photo ");
         cv.readImage(data.face, function (err,im) {
             if (err) throw err;
-            im.save('photo.jpg');
+            im.save('../face_recognizer/faces_to_recognize/' + socket.id + '.' + day + '.' + time +  '.face.jpg');
         });
     });
 
