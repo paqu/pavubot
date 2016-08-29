@@ -22,6 +22,15 @@ app.get('/api/robots/:id/control',auth.hasRole('admin'), function (req,res) {
 
     res.json(robots[index]);
 });
+app.post('/api/wanted/', function (req,res) {
+    var data = {};
+    logger("[emit] user:robot:face_recognize to " + req.body.chanel);
+    data.recognized_person_id = req.body.recognized_person;
+    data.time = req.body.date + "," + req.body.time;
+    chanel = '/'+ req.body.chanel;
+    video_nsp.in(chanel).emit("user:robot:face_recognize",data);
+    res.status(200).json({});
+});
 
 
 
