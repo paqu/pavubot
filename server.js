@@ -64,14 +64,13 @@ function createRobot(socket_id, address_ip, data){
 }
 
 function controlConnection (socket) {
-    var robot = {dupa:'init'};
+    var robot = {};
     var address_ip = socket.handshake.address;
     var socket_id = socket.id;
     var watchers = 0;
 
     logger("Control connection from " + address_ip + ", socket id: " + socket_id);
 
-    console.log(robots);
     socket.on("server:control:init_data", function (data) {
         logger("[on] server:control:init_data");
         robot = _.merge({"control_socket_id":socket_id}, data);
@@ -272,7 +271,7 @@ function userConnection(socket) {
 
     socket.on("server:user:go_straight", function(data) {
         logger("[on] server:user:go_straight");
-        control_nsp.to(data.robot_id).emit("robot:go_straight", {});
+        control_nsp.to(data.robot_id).emit("robot::go_straight", {});
     });
 
     socket.on("server:user:go_back", function(data) {
