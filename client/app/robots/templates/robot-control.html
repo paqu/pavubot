@@ -33,7 +33,7 @@
 
 
             },
-            keyup:function (event) {   
+            keyup:function (event) {
               if (event.which === 79) {
                 angular.element($('#robotCtrl')).scope().robotStop();
                 $('#up').removeClass('btn-info');
@@ -138,70 +138,88 @@
     </div>
     <div class="col-md-7 col-sm-12">
       <div class="panel panel-default">
-          <div class="panel-heading text-center" >Mapa pomieszczenia</div>
-            <div class="panel-body h-321">
-                <div class="container center">
-                  <canvas id="canvas-video" height="320"></canvas>
+          <div class="panel-heading text-center" >Identyfikacja osoby</div>
+            <div class="panel-body h-321 ">
+              <div ng-show="!isRecognized()" class="text-center">Nie rozpoznano żadnej osoby.</div>
+              <div ng-show="isRecognized()">
+                <h4 class="text-center" style="margin-bottom:30px"> Rozpoznano poniższa osobę </h4>
+                <div class="col-sm-6">
+                  <center><img src="/subject01.normal" height="150px"></center>
                 </div>
+                <div class="col-sm-6">
+                  <div class="caption">
+                    <h3>Imie Nazwisko</h3>
+                    <p> <b>Ostanio widziany:</b> Data</p>
+                    <p> <a ui-sref="" class="btn btn-default" role="button">Sczegóły</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
       </div>
       <div class="panel panel-default">
-          <div class="panel-heading text-center">Konfiguracja</div>
-            <div class="panel-body">
-              <div class="col-xs-12 col-md-4">
-                <form name="update_speed_form" novalidate class="form-horizontal" ng-submit="updateSpeed()">
-                  <h3 class="config-header">Silnik</h3>
-                  <div class="input-group input-group-sm" style="margin-top:20px;margin-bottom:20px">
-                    <span class="input-group-addon" id="sizing-addon3">Lewy</span>
-                    <input class="form-control" placeholder="predkość [0-100]" ng-pattern="/^([0-9]|[1-9][0-9]|100)$/" ng-model="robot.left_motor_speed" required>
-                  </div>
-                  <div class="input-group input-group-sm">
-                    <span class="input-group-addon" id="sizing-addon3">Prawy</span>
-                    <input  class="form-control" placeholder="predkość [0-100]" ng-pattern="/^([0-9]|[1-9][0-9]|100)$/" ng-model="robot.right_motor_speed" required>
-                  </div>
-                  <br>
-                  <div class="alert alert-danger" ng-show="isSpeedError">
-                    {{speed_error_msg}}
-                  </div>
-                  <div class="input-group input-group-sm pull-right" style="">
-                    <input  type="submit" class="btn btn-primary " value="Ustaw">
-                  </div>
-                </form>
+        <div class="panel-heading text-center">Konfiguracja</div>
+        <div class="panel-body">
+          <div class="col-md-6">
+            <form name="update_speed_form" novalidate class="form-horizontal" ng-submit="updateSpeed()">
+              <h3 class="config-header">Silnik</h3>
+              <div class="input-group input-group-sm" style="margin-top:20px;margin-bottom:20px">
+                <span class="input-group-addon" id="sizing-addon3">Lewy</span>
+                <input class="form-control" placeholder="predkość [0-100]" ng-pattern="/^([0-9]|[1-9][0-9]|100)$/" ng-model="robot.left_motor_speed" required>
               </div>
-              <div class="col-xs-12 col-md-4">
-                <h3 class="config-header">Czujnik odległości</h3>
-                
-
-                  <div class="input-group input-group-sm" style="margin-top:25px;margin-bottom:25px">
-                   <label class="radio-inline"><input type="radio" name="distance_sensor" ng-model="distance_sensor" value="sonar">Sonar</label>
-                   <label class="radio-inline"><input type="radio" name="distance_sensor" ng-model="distance_sensor" value="infrared">Podczerwień</label> 
-                  </div>
-
-
-                <div class="input-group input-group-sm">
-                  <span class="input-group-addon" id="sizing-addon3">Odległość</span>
-                  <div class="form-control" ng-show="isSonar()">{{getDistanceSensorSonar()}}</div>
-                  <div class="form-control" ng-show="isInfrared()">{{getDistanceSensorInfrared()}}</div>
-                </div>
+              <div class="input-group input-group-sm">
+                <span class="input-group-addon" id="sizing-addon3">Prawy</span>
+                <input  class="form-control" placeholder="predkość [0-100]" ng-pattern="/^([0-9]|[1-9][0-9]|100)$/" ng-model="robot.right_motor_speed" required>
               </div>
-
-              <div class="col-xs-12 col-md-4">
-                <h3 class="config-header">Enkoder<h3>
-
-                <div class="input-group input-group-sm" style="margin-bottom:20px">
-                  <span class="input-group-addon">Lewy</span>
-                  <div class="form-control">{{getLeftEncoder()}}</div>
-                </div>
-
-                <div class="input-group input-group-sm">
-                  <span class="input-group-addon">Prawy</span>
-                  <div class="form-control">{{getRightEncoder()}}</div>
-                </div>
-
+              <br>
+              <div class="alert alert-danger" ng-show="isSpeedError">
+                {{speed_error_msg}}
               </div>
+              <div class="input-group input-group-sm pull-right" style="">
+                <input  type="submit" class="btn btn-primary " value="Ustaw">
+              </div>
+            </form>
+          </div> <!-- col first -->
+          <div class="col-md-6">
+            <h3 class="config-header">Tryb</h3>
+            <br>
+            <div class="input-group input-group-sm" style="margin:0 auto">
+               <label class="radio-inline"><input type="radio" name="robot_mode"   ng-model="robot_mode" value="auto">Auto</label>
+               <label class="radio-inline"><input type="radio" name="robot_mode"   ng-model="robot_mode" value="manual">Manual</label>
             </div>
-      </div>
-    </div>
+          </div> <!-- col second -->
+         </div> <!-- panel-body -->
+      </div> <!-- panel-default -->
+
+      <div class="panel panel-default">
+        <div class="panel-heading text-center">Odczyty czujników</div>
+        <div class="panel-body">
+          <div class="col-md-6">
+            <h3 class="config-header">Czujnik odległości</h3>
+            <div class="input-group input-group-sm" style="margin:25px auto;">
+             <label class="radio-inline"><input type="radio" name="distance_sensor" ng-model="distance_sensor" value="sonar">Sonar</label>
+             <label class="radio-inline"><input type="radio" name="distance_sensor" ng-model="distance_sensor" value="infrared">Podczerwień</label>
+            </div>
+            <div class="input-group input-group-sm">
+              <span class="input-group-addon" id="sizing-addon3">Odległość</span>
+              <div class="form-control" ng-show="isSonar()">{{getDistanceSensorSonar()}}</div>
+              <div class="form-control" ng-show="isInfrared()">{{getDistanceSensorInfrared()}}</div>
+            </div>
+          </div> <!-- col first -->
+          <div class="col-md-6">
+            <h3 class="config-header">Enkoder<h3>
+            <div class="input-group input-group-sm" style="margin-bottom:20px">
+              <span class="input-group-addon">Lewy</span>
+              <div class="form-control">{{getLeftEncoder()}}</div>
+            </div>
+            <div class="input-group input-group-sm">
+              <span class="input-group-addon">Prawy</span>
+              <div class="form-control">{{getRightEncoder()}}</div>
+            </div>
+          </div> <!-- col second -->
+        </div> <!-- panel-body -->
+      </div><!-- panel-default -->
+
   </div>
   <div class="row">
     <div class="col-md-12">
