@@ -144,13 +144,13 @@
               <div ng-show="isRecognized()">
                 <h4 class="text-center" style="margin-bottom:30px"> Rozpoznano poniższa osobę </h4>
                 <div class="col-sm-6">
-                  <center><img src="/subject01.normal" height="150px"></center>
+                  <center><img src="{{recognized_person.main_photo}}" height="150px"></center>
                 </div>
                 <div class="col-sm-6">
                   <div class="caption">
-                    <h3>Imie Nazwisko</h3>
-                    <p> <b>Ostanio widziany:</b> Data</p>
-                    <p> <a ui-sref="" class="btn btn-default" role="button">Sczegóły</a>
+                    <h3>{{recognized_person.firstname}} {{recognized_person.surname}}</h3>
+                    <p> <b>Ostanio widziany:</b> {{recognized_person.time}}</p>
+                    <p> <a ui-sref="viewWanted({id: recognized_person._id})" target="_blank" class="btn btn-default" role="button">Sczegóły</a>
                     </p>
                   </div>
                 </div>
