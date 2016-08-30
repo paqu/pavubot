@@ -181,12 +181,20 @@
             </form>
           </div> <!-- col first -->
           <div class="col-md-6">
-            <h3 class="config-header">Tryb</h3>
-            <br>
-            <div class="input-group input-group-sm" style="margin:0 auto">
-               <label class="radio-inline"><input type="radio" name="robot_mode"   ng-model="robot_mode" value="auto">Auto</label>
-               <label class="radio-inline"><input type="radio" name="robot_mode"   ng-model="robot_mode" value="manual">Manual</label>
-            </div>
+            <form name="change_robot_mode" novalidate class="form-horizontal" ng-submit="changeRobotMode()">
+              <h3 class="config-header">Tryb</h3>
+              <br>
+              <div class="input-group input-group-sm" style="margin:0 auto">
+                 <label class="radio-inline"><input type="radio" name="robot_mode"   ng-model="robot_mode" value="auto">Auto</label>
+                 <label class="radio-inline"><input type="radio" name="robot_mode"   ng-model="robot_mode" value="manual">Manual</label>
+              </div>
+              <br>
+              <br>
+              <br>
+              <div class="input-group input-group-sm" style="margin:0 auto">
+                <input  type="submit" class="btn btn-primary " value="Ustaw">
+              </div>
+            </form>
           </div> <!-- col second -->
          </div> <!-- panel-body -->
       </div> <!-- panel-default -->

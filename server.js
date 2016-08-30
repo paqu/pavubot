@@ -9,6 +9,8 @@ var app             = require('./app');
 var config          = require('./config');
 var auth            = require('./auth/auth.service');
 
+const AUTO_MODE   = 0;
+const MANUAL_MODE = 1;
 
 app.get('/api/robots/', function (req,res) {
     res.json(robots);
@@ -37,14 +39,6 @@ app.post('/api/wanted/', function (req,res) {
 var server = http.createServer(app);
 var io = new socketio_server(server);
 
-function startServer() {
-    server.listen(config.port, config.io, function() {
-        logger("Express server listening on " + config.port + ", in "+ app.get('env')+ " mode","gray");
-    });
-}
-
-
-setImmediate(startServer);
 var control_nsp = io.of('/control');
 var video_nsp   = io.of('/video');
 var user_nsp    = io.of('/user');
@@ -63,6 +57,7 @@ function createRobot(socket_id, address_ip, data){
         return robot;
 }
 
+
 function controlConnection (socket) {
     var robot = {};
     var address_ip = socket.handshake.address;
@@ -70,6 +65,7 @@ function controlConnection (socket) {
     var watchers = 0;
 
     logger("Control connection from " + address_ip + ", socket id: " + socket_id);
+
 
     socket.on("server:control:init_data", function (data) {
         logger("[on] server:control:init_data");
@@ -313,6 +309,31 @@ function userConnection(socket) {
         });
     });
 
+    socket.on("server:user:change_mode", function(data) {
+        logger("server:user:change_mode");
+
+        for (var index = 0; index < robots.length; index++) {
+            if (robots[index].control_socket_id == data.robot_id) {
+                break;
+            }
+        }
+
+        if (data.mode == "auto") {
+            robots[index].robot_mode = AUTO_MODE;
+            logger("[emit] robot::automode");
+            control_nsp.to(data.robot_id).emit("robot::automode", {});
+        }else {
+            robots[index].robot_mode = MANUAL_MODE;
+            logger("[emit] robot::manualmode");
+            control_nsp.to(data.robot_id).emit("robot::manualmode", {});
+        }
+
+        user_nsp.emit("user:robots_list:change_mode", {
+            mode:robots[index].robot_mode,
+            id:robots[index]._id
+        });
+    });
+
     var SERVO_CHANGE = "server:user:change_camera_angle_to";
     var SERVO_UPDATE = "robot::change_camera_angle_to";
 
@@ -381,3 +402,11 @@ function userConnection(socket) {
     });
 }
 
+function startServer() {
+    server.listen(config.port, config.io, function() {
+        logger("Express server listening on " + config.port + ", in "+ app.get('env')+ " mode","gray");
+    });
+}
+
+
+setImmediate(startServer);

@@ -30,6 +30,17 @@ angular.module("inzApp")
             $scope.robots[index].video_socket_id = data.video_socket_id;
         });
 
+        Socket.on("user:robots_list:change_mode", function (data) {
+            console.log("[on] user:robots_list:change_mode:" + data.mode);
+
+            for (var index = 0; index < $scope.robots.length; index++)
+               if ($scope.robots[index]._id ==  data.id)
+                   break;
+
+            $scope.robots[index].robot_mode = data.mode;
+        });
+
+
         Socket.on("user:robots_list:remove_robot", function (data) {
             console.log("[on] user:robots_list:remove_robot");
 
@@ -91,6 +102,8 @@ angular.module("inzApp")
         $scope.robot = {};
         $scope.change_direction_by = 90;
         $scope.distance_sensor = "infrared";
+
+        $scope.robot_mode;
         $scope.isSpeedError;
         $scope.speed_error_msg;
 
@@ -100,6 +113,7 @@ angular.module("inzApp")
         $scope.getDistanceSensorInfrared = getDistanceSensorInfrared;
 
         $scope.updateSpeed        = updateSpeed; 
+        $scope.changeRobotMode    = changeRobotMode;
 
         $scope.getLeftEncoder     = getLeftEncoder;
         $scope.getRightEncoder    = getRightEncoder;
@@ -216,7 +230,6 @@ angular.module("inzApp")
 
             if (!getLeftMotorSpeed()) {
                 setSpeedError(LEFT_SPEED_ERR_MSG);
-                return;
             }
 
             if (!getRightMotorSpeed()) {
@@ -226,6 +239,22 @@ angular.module("inzApp")
 
             clearSpeedError();
             emitToServerUpdateSpeed();
+        }
+
+        function changeRobotMode() {
+            if ($scope.robot_mode == "auto") {
+                console.log("[emit] server:user:change_mode to: " + $scope.robot_mode);
+                Socket.emit("server:user:change_mode", {
+                    robot_id:getRobotId(),
+                    mode:$scope.robot_mode
+                });
+            }else {
+                console.log("[emit] server:user:change_mode to: " + $scope.robot_mode);
+                Socket.emit("server:user:change_mode", {
+                    robot_id:getRobotId(),
+                    mode:$scope.robot_mode
+                });
+            }
         }
 
         function getLeftEncoder() {
@@ -269,7 +298,7 @@ angular.module("inzApp")
         function setCameraAngleCenter() {
             console.log("set servo to center");
             setCameraAngle(0);
-            updateView();right_encoder_distance
+            updateView();
             emitToServerCameraAngleChange();
         }
         
@@ -360,8 +389,18 @@ angular.module("inzApp")
             return $scope.robot.camera_angle;
         }
 
+        function setMotorMode(val) {
+            $scope.robot_mode = val;
+        }
+
+
         $http.get('/api/robots/' + $stateParams.id +"/control").then(function (response) {
             $scope.robot = response.data;
+            if (response.data.robot_mode) {
+                setMotorMode("manual");
+            } else {
+                setMotorMode("auto");
+            }
             console.log("[emit] server:user:join_to_robot_chanel:" + getRobotId());
             Socket.emit("server:user:join_to_robot_chanel",{chanel:getRobotId()});
         });
@@ -400,7 +439,7 @@ angular.module("inzApp")
             alert('robot ' + $scope.robot.robot_name + ' rozłączył się.');
             $state.go('robots');
         });
-        
+
         VideoSocket.on("user:robot:frame", function (data) {
             console.log("[on]:user:robot:frame");
             var uint8Arr = new Uint8Array(data.frame);
