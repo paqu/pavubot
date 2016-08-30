@@ -81,7 +81,7 @@ angular.module("inzApp")
 
 }])
 
-    .controller('RobotCtrl',['$scope','$state', '$http','$document','$timeout', 'Socket','VideoSocket', '$stateParams', function ($scope, $state, $http, $document,$timeout, Socket, VideoSocket, $stateParams) {
+    .controller('RobotCtrl',['$scope','$state', '$http','$document','$timeout', 'Socket','VideoSocket', '$stateParams', 'Wanted', function ($scope, $state, $http, $document,$timeout, Socket, VideoSocket, $stateParams,Wanted) {
 
 
         var UPDATE_SPEED = "server:user:update_speed_both";
@@ -440,6 +440,39 @@ angular.module("inzApp")
             $state.go('robots');
         });
 
+        $scope.recognized = false;
+        $scope.isRecognized = isRecognized;
+        $scope.recognized_person  = {
+        }
+
+        function setRecognized(val) {
+            $scope.recognized = val;
+        }
+
+        function getRecognized() {
+            return $scope.recognized;
+        }
+
+        function isRecognized() {
+            return getRecognized();
+        }
+
+        VideoSocket.on("user:robot:face_recognize", function (data) {
+            console.log("[on] user:robot:face_recognize");
+            console.log(JSON.stringify(data));
+
+            if (data.recognized_person_id == 'not_recognized'){
+                setRecognized(false);
+                console.log('not recognized');
+            } else {
+                $scope.recognized_person = Wanted.get({id:data.recognized_person_id});
+                $scope.recognized_person.time = data.time;
+                setRecognized(true);
+                console.log('recognized');
+            }
+
+            console.log(data.recognized_person_id);
+        });
         VideoSocket.on("user:robot:frame", function (data) {
             console.log("[on]:user:robot:frame");
             var uint8Arr = new Uint8Array(data.frame);
