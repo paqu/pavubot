@@ -46,6 +46,8 @@ if ('development' === config.env || 'test' === config.env) {
     app.use(express.static(path.join(config.root, '.tmp')));
     //app.use(express.static(app.get('appPath')));
     app.use(express.static('/home/paqu/inz2/client/'));
+    app.use(express.static('/home/paqu/inz2/main_photo/'));
+    app.use(express.static('/home/paqu/inz2/faces_database/'));
     app.use(morgan('dev'));
     app.use(errorHandler());
 }
