@@ -154,6 +154,10 @@ function controlConnection (socket) {
 
 
 function videoConnection(socket) {
+    var faceCascade = './node_modules/opencv/data/haarcascade_frontalface_alt2.xml';
+    var rectColor = [0, 255, 0];
+    var rectThickness = 2;
+
     var address_ip = socket.handshake.address;
     var socket_id = socket.id
     logger("Video connection from " + address_ip + ", socket id: " + socket_id);
@@ -179,7 +183,29 @@ function videoConnection(socket) {
     socket.on("server:video:frame", function (data) {
         logger("[on]:server_video_nsp:frame");
         logger("[emit]:user:robot:frame");
-        video_nsp.in(socket.id).emit("user:robot:frame",{frame: data.frame});
+
+        cv.readImage(data.frame, function (err,im) {
+            if (err) throw err;
+
+            im.detectObject(faceCascade,{}, function(err, faces) {
+
+                if (err) throw err;
+
+                for (var i = 0; i < faces.length; i++) {
+                    logger("[emit]:server:video:face");
+                    face = faces[i];
+                    date = new Date();
+
+                    day  = date.getDate() + '-' + date.getMonth() + 1 + '-' + date.getFullYear()
+                    time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    im.save('../face_recognizer/faces_to_recognize/' + socket.id + '.' + day + '.' + time +  '.face.jpg');
+                    im.rectangle([face.x, face.y], [face.width, face.height],
+                          rectColor, rectThickness);
+                }
+                video_nsp.in(socket.id).emit("user:robot:frame",{frame: im.toBuffer()});
+            });
+        });
+
     });
 
     socket.on("server:user:stop_video", function (data) {
