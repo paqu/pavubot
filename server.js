@@ -113,7 +113,8 @@ function controlConnection (socket) {
 
     socket.on("server:control:update_right_encoder_distance",function (data){
         logger("[on] server:control:update_right_encoder_distance: " + JSON.stringify(data));
-        robots[robots.indexOf(robot)].right_encoder_disatnce = data.right_encoder_distance;
+        if(robots[robots.indexOf(robot)] != undefined)
+            robots[robots.indexOf(robot)].right_encoder_disatnce = data.right_encoder_distance;
         logger("[emit] user:robot:update_right_encoder_distance: " + JSON.stringify(data));
         user_nsp.in(socket_id).emit("user:robot:update_right_encoder_distance",
                 {right_encoder_distance:data.right_encoder_distance});
@@ -121,7 +122,8 @@ function controlConnection (socket) {
 
     socket.on("server:control:update_distance_sensor_sonar",function (data){
         logger("Control:[on] server:update_distance_sensor_sonar: " + JSON.stringify(data));
-        robots[robots.indexOf(robot)].distance_sensor_sonar = data.distance_sensor_sonar;
+        if(robots[robots.indexOf(robot)] != undefined)
+            robots[robots.indexOf(robot)].distance_sensor_sonar = data.distance_sensor_sonar;
         logger("Control:[emit] user_robot:update_distance_sensor_sonar: " + JSON.stringify(data));
         user_nsp.in(socket_id).emit("user:robot:update_distance_sensor_sonar"
                 ,{distance_sensor_sonar:data.distance_sensor_sonar});
@@ -129,7 +131,8 @@ function controlConnection (socket) {
 
     socket.on("server:control:update_distance_sensor_infrared",function (data){
         logger("Control:[on] server:update_distance_sensor_infrared: " + JSON.stringify(data));
-        robots[robots.indexOf(robot)].distance_sensor_infrared = data.distance_sensor_infrared;
+        if(robots[robots.indexOf(robot)] != undefined)
+            robots[robots.indexOf(robot)].distance_sensor_infrared = data.distance_sensor_infrared;
         logger("Control:[emit] user_robot:update_distance_sensor_infrared: " + JSON.stringify(data));
         user_nsp.in(socket_id).emit("user:robot:update_distance_sensor_infrared"
                 ,{distance_sensor_infrared:data.distance_sensor_infrared});
