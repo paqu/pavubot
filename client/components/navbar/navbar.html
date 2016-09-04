@@ -19,7 +19,7 @@
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
-        <li ng-hide="isLoggedIn()" ui-sref-active="active"><a ui-sref="signup">Rejestracja</a></li>
+        <!--<li ng-hide="isLoggedIn()" ui-sref-active="active"><a ui-sref="signup">Rejestracja</a></li> -->
         <li ng-hide="isLoggedIn()" ui-sref-active="active"><a ui-sref="login">Zaloguj</a></li>
         <li ng-show="isLoggedIn()"><p class="navbar-text">Witaj {{ getCurrentUser().name }}</p> </li>
         <li ng-show="isLoggedIn()" ui-sref-active="active"><a ui-sref="settings"><span class="glyphicon glyphicon-cog"></span></a></li>
