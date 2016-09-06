@@ -165,21 +165,6 @@ function videoConnection(socket) {
     logger("Send socket id " + socket.id + " to " + address_ip);
     socket.emit('video::video_socket_id', { socket_id:socket.id});
 
-    socket.on("server:video:face", function (data) {
-        logger("[on]:server:video:face");
-
-        date = new Date();
-
-        day  = date.getDate() + '-' + date.getMonth() + 1 + '-' + date.getFullYear()
-        time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-
-        logger("[save]:save photo ");
-        cv.readImage(data.face, function (err,im) {
-            if (err) throw err;
-            im.save('../face_recognizer/faces_to_recognize/' + socket.id + '.' + day + '.' + time +  '.face.jpg');
-        });
-    });
-
     socket.on("server:video:frame", function (data) {
         logger("[on]:server_video_nsp:frame");
         logger("[emit]:user:robot:frame");
