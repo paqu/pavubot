@@ -86,7 +86,6 @@ angular.module("inzApp")
 
         var UPDATE_SPEED = "server:user:update_speed_both";
         var SERVO_CHANGE = "server:user:change_camera_angle_to";
-        var ROBOT_MOVE   = "server:user:robot_move";
         var STOP_VIDEO   = "server:user:stop_video";
         var START_VIDEO  = "server:user:start_video";
 
