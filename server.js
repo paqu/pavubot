@@ -183,7 +183,7 @@ function videoConnection(socket) {
 
                     day  = date.getDate() + '-' + date.getMonth() + 1 + '-' + date.getFullYear()
                     time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-                    im.save('../face_recognizer/faces_to_recognize/' + socket.id + '.' + day + '.' + time +  '.face.jpg');
+                    im.save('../face_recognizer/pavubot/faces_to_recognize/' + socket.id + '.' + day + '.' + time +  '.face.jpg');
                     im.rectangle([face.x, face.y], [face.width, face.height],
                           rectColor, rectThickness);
                 }
