@@ -5,3 +5,8 @@ bigiel/dev/*
 /**/*.swo
 /**/*.swn
 /**/*.swm
+faces_database/
+faces_database
+main_photo/
+config2/
+server2.js
