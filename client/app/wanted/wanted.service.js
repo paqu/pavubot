@@ -2,46 +2,47 @@ angular.module('inzApp')
     .factory('Wanted', function () {
         var last_id = 5;
         var example_wanted = [
-            {_id: 1,
+            {_id: 16,
              firstname: 'Pawel',
              surname:'Kusz',
              time:'xxxx-xx-xx xx:xx:xx',
              location_:'xxxx',
              status_:false,
              description: 'Lorem ipsum dolor sit amet',
-             main_photo:'/subject01.normal',
+             main_photo:'/subject16.normal',
              other_photos: [
 
-                '/subject01.glasses',
-                '/subject01.noglasses',
-                '/subject01.rightlight',
-                '/subject01.leftlight',
-                '/subject01.happy',
-                '/subject01.sleepy',
-                '/subject01.wink',
-                '/subject01.surprised',
+                '/subject16.glasses',
+                '/subject16.noglasses',
+                '/subject16.rightlight',
+                '/subject16.leftlight',
+                '/subject16.happy',
+                '/subject16.sleepy',
+                '/subject16.wink',
+                '/subject16.surprised',
              ],
             },
-            {_id: 2,
+            {_id: 17,
              firstname: 'Maciej',
              surname:'Sobkowski',
              time:'xxxx-xx-xx xx:xx:xx',
              location_:'xxxx',
              status_:false,
              description: 'Lorem ipsum dolor sit amet',
-             main_photo:'/subject02.normal',
+             main_photo:'/subject17.normal',
              other_photos: [
 
-                '/subject02.glasses',
-                '/subject02.noglasses',
-                '/subject02.rightlight',
-                '/subject02.leftlight',
-                '/subject02.happy',
-                '/subject02.sleepy',
-                '/subject02.wink',
-                '/subject02.surprised',
+                '/subject17.glasses',
+                '/subject17.noglasses',
+                '/subject17.rightlight',
+                '/subject17.leftlight',
+                '/subject17.happy',
+                '/subject17.sleepy',
+                '/subject17.wink',
+                '/subject17.surprised',
              ],
-            },
+            }
+            /*
             {_id: 3,
              firstname: 'Adam',
              surname:'Olek',
@@ -102,6 +103,7 @@ angular.module('inzApp')
                 '/subject05.surprised',
              ],
             }
+            */
         ];
          return {
             query: function(){
