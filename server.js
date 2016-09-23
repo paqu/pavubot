@@ -24,6 +24,10 @@ app.get('/api/robots/:id/control',auth.hasRole('admin'), function (req,res) {
 
     res.json(robots[index]);
 });
+
+
+var wantedList = [];
+
 app.post('/api/wanted/', function (req,res) {
     var data = {};
     logger("[emit] user:robot:face_recognize to " + req.body.chanel);
@@ -31,6 +35,25 @@ app.post('/api/wanted/', function (req,res) {
     data.time = req.body.date + "," + req.body.time;
     chanel = '/'+ req.body.chanel;
     video_nsp.in(chanel).emit("user:robot:face_recognize",data);
+    res.status(200).json({});
+});
+
+app.post('/api/wanted/addToList/:id', function (req,res) {
+    console.log("Dostalem nowego poszukiwanego");
+    console.log(wantedList);
+    wantedList.push({'id':req.params.id});
+    console.log(wantedList);
+    res.status(200).json({});
+});
+
+app.delete('/api/wanted/removeFromList/:id', function (req,res) {
+    console.log(wantedList);
+    for (var i = 0; i < wantedList.length; i++) {
+        if (wantedList[i].id == req.params.id) {
+            wantedList.splice(i,1);
+        }
+    }
+    console.log(wantedList);
     res.status(200).json({});
 });
 
