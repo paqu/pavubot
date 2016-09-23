@@ -28,6 +28,8 @@
           <p>
           <!--<a href="" class="btn btn-primary" role="button">Widziałem</a> -->
             <a ui-sref="viewWanted({id: w._id})" class="btn btn-default" role="button">Szczegóły</a>
+            <button type="button" ng-show="!w.status" ng-click="addToWantedList(w._id)"      class="btn btn-info">Dodaj </button>
+            <button type="button" ng-show="w.status"  ng-click="removeFromWantedList(w._id)" class="btn btn-danger">Usuń </button>
           </p>
         </div>
       </div>
