@@ -30,33 +30,62 @@ var wantedList = [];
 
 app.post('/api/wanted/', function (req,res) {
     var data = {};
-    logger("[emit] user:robot:face_recognize to " + req.body.chanel);
-    data.recognized_person_id = req.body.recognized_person;
-    data.time = req.body.date + "," + req.body.time;
-    chanel = '/'+ req.body.chanel;
-    video_nsp.in(chanel).emit("user:robot:face_recognize",data);
+    var chanel = '/'+ req.body.chanel;
+    var id = req.body.recognized_person;
+    var index = -1;
+    var robot_id = findRobotIdByVideoId(robots, chanel);
+
+    if (index != getElementIndex(wantedList, id)) {
+
+        if (wantedList[index].isRecognized == false) {
+            wantedList[index] = true;
+            recognized_count++;
+        }
+
+        if (recognized_count == wantedList.length) {
+            logger("[emit] user:robots_list:add_robot");
+            control_nsp.to(robot_id).emit("robot::recognized_all_wanted", {});
+        }
+
+        data.recognized_person_id = id;
+        data.time = req.body.date + "," + req.body.time;
+        logger("[emit] user:robot:face_recognize to " + chanel);
+        video_nsp.in(chanel).emit("user:robot:face_recognize",data);
+    }
     res.status(200).json({});
 });
 
 app.post('/api/wanted/addToList/:id', function (req,res) {
-    console.log("Dostalem nowego poszukiwanego");
-    console.log(wantedList);
-    wantedList.push({'id':req.params.id});
-    console.log(wantedList);
+    wantedList.push({'id':req.params.id, 'isRecognized':false});
     res.status(200).json({});
 });
 
 app.delete('/api/wanted/removeFromList/:id', function (req,res) {
-    console.log(wantedList);
     for (var i = 0; i < wantedList.length; i++) {
         if (wantedList[i].id == req.params.id) {
             wantedList.splice(i,1);
         }
     }
-    console.log(wantedList);
     res.status(200).json({});
 });
 
+function getElementIndex(arr,val) {
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i].id == val) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+function findRobotIdByVideoId(arr,id) {
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i].video_socket_id == id) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 
 var server = http.createServer(app);
