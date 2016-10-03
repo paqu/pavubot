@@ -36,7 +36,7 @@ server_socket.on('message', function(msg, rinfo) {
 
                     day  = date.getDate() + '-' + date.getMonth() + 1 + '-' + date.getFullYear()
                     time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-                    im.save('../face_recognizer/pavubot/faces_to_recognize/' + id + '.' + day + '.' + time +  '.face.jpg');
+                    im.save(config.faces_to_recognize + id + '.' + day + '.' + time +  '.face.jpg');
                     im.rectangle([face.x, face.y], [face.width, face.height],
                           rectColor, rectThickness);
                 }

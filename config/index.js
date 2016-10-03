@@ -19,6 +19,7 @@ var config = {
             }
         }
     },
+    faces_to_recognize = '../rozpoznawanie_twarzy/faces_to_recognize/',
 
     userRoles : ['quest','user','admin']
 };
