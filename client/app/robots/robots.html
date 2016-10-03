@@ -1,0 +1,43 @@
+<style>
+.robots_list thead th {
+  text-align:center;
+}
+.robots_list tbody td {
+  text-align:center;
+}
+</style>
+<div class="container">
+  <div class="row">
+    <div class="table-responsive">
+      <div ng-show="robots.length" class="ng-hide">
+        <table class="table table-bordered robots_list">
+          <thead>
+            <th>Lp.</th>
+            <th>Nazwa robota</th>
+            <th>Adres IP </th>
+            <th>Tryb </th>
+            <th>Transmisja obrazu</th>
+            <th>  </th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="robot in robots">
+              <td>{{$index}} </td>
+              <td>{{getRobotName($index)}} </td>
+              <td>{{getRobotAddressIP($index)}} </td>
+              <td>{{getRobotMode($index)}}</td>
+              <td>
+                <i ng-if="isVideoConnected($index)" class="glyphicon glyphicon-ok-sign text-success"></i>
+                <i ng-if="!isVideoConnected($index)"class="glyphicon glyphicon-minus text-danger"></i>
+              </td>
+              <td>
+                <a class="btn btn-info" ui-sref="robot-control({id:robot._id})"> Steruj </a>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div ng-show="!robots.length" class="ng-hide">
+        <p> Brak zarejestrowanych robotów </p>
+      </div>
+    </div>
+  </div>
+</div>

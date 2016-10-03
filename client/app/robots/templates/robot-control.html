@@ -1,0 +1,237 @@
+
+    <script>
+        $(document).ready(function() {
+          $(document).on({
+            keydown:function (event) {
+              if (event.which === 79) {
+                $('#up').addClass('btn-info');
+                angular.element($('#robotCtrl')).scope().goStraight();
+              } else if (event.which === 76) {
+                $('#down').addClass('btn-info');
+                angular.element($('#robotCtrl')).scope().goBack();
+              } else if (event.which === 75) {
+                $('#left').addClass('btn-info');
+                angular.element($('#robotCtrl')).scope().turnLeft();
+              } else if (event.which === 186) {
+                $('#right').addClass('btn-info');
+                angular.element($('#robotCtrl')).scope().turnRight();
+              } else if (event.which === 65) {
+                angular.element($('#robotCtrl')).scope().decTurnAngle();
+              } else if (event.which === 83) {
+                angular.element($('#robotCtrl')).scope().incTurnAngle();
+              } else if (event.which === 90) {
+                angular.element($('#robotCtrl')).scope().decCameraAngle();
+              } else if (event.which === 88) {
+                angular.element($('#robotCtrl')).scope().incCameraAngle();
+              } else if (event.which === 67) {
+                angular.element($('#robotCtrl')).scope().cameraAngleMin();
+              } else if (event.which === 86) {
+                angular.element($('#robotCtrl')).scope().cameraAngleCenter();
+              } else if (event.which === 66) {
+                angular.element($('#robotCtrl')).scope().cameraAngleMax();
+              }
+
+
+            },
+            keyup:function (event) {
+              if (event.which === 79) {
+                angular.element($('#robotCtrl')).scope().robotStop();
+                $('#up').removeClass('btn-info');
+              } else if (event.which === 76) {
+                angular.element($('#robotCtrl')).scope().robotStop();
+                $('#down').removeClass('btn-info');
+              } else if (event.which === 75) {
+                angular.element($('#robotCtrl')).scope().robotStop();
+                $('#left').removeClass('btn-info');
+              } else if (event.which === 186) {
+                angular.element($('#robotCtrl')).scope().robotStop();
+                $('#right').removeClass('btn-info');
+              } else if (event.which === 90) {
+                angular.element($('#robotCtrl')).scope().updateCameraAngle();
+              } else if (event.which === 88) {
+                angular.element($('#robotCtrl')).scope().updateCameraAngle();
+              }
+            }
+          });
+        });
+    </script>
+<div class="container" id="robotCtrl" ng-controller="RobotCtrl">
+  <div class="row">
+    <h2 class="text-center" style="margin-top:0;margin-bottom:20px"> Panel sterowania robotem {{robot.robot_name}} </h2>
+    <div class="col-md-5 col-sm-12">
+      <div class="panel panel-default">
+        <div class="panel-heading text-center">Transmisja obrazu -
+          <span ng-if="!isVideoConnected()">brak połączenia</span>
+          <span ng-if="isVideoConnected()">uzyskano połączenie</span>
+        </div>
+            <div class="panel-body h-321">
+              <div ng-show="!video_frame && isVideoConnected()" class="video-contener">Włącz transmisje</div>
+              <img ng-src="{{video_frame}}" ng-show="video_frame" class="video-contener" id="canvas-video">
+                <div class="btn-group btn-group-justified btn-video" ng-if="isVideoConnected()" role="group">
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-info" ng-click="start_video()">Start</button>
+                  </div>
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-info" ng-click="stop_video()">Stop</button>
+                  </div>
+                </div>
+            </div>
+      </div>
+      <div class="panel panel-default">
+          <div class="panel-heading text-center">Sterowanie</div>
+          <div class="panel-body">
+            <div class="row" style="margin:20px 0">
+              <div class="col-md-12">
+                <div id="servo">
+                  <div class="row">
+                    <span class="col-xs-12 text-center">Serwo</span>
+                  </div>
+                  <div class="row">
+                    <span class="col-xs-1">-90</span>
+                    <span class="col-xs-10 text-center">{{getCameraAngle()}}</span>
+                    <span class="col-xs-1">90</span>
+                  </div>
+                  <div class="row">
+                    <div class="progress progress_clear rightToLeft col-xs-6">
+                      <div class="progress-bar progress-bar-success" role="progressbar" style="width:{{-getCameraAngle()/90 * 100}}%"></div>
+                    </div>
+                    <div class="progress progress_clear col-xs-6">
+                      <div class="progress-bar progress-bar-success" role="progressbar" style="width:{{getCameraAngle()/90 * 100}}%"></div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            <div class="row" style="margin:20px 0">
+              <div class="col-md-12">
+                <div id="angle">
+                  <div class="row">
+                    <span class="col-md-12 text-center">Kąt obrotu: <input type="number" min="0" max="180" ng-model="change_direction_by" style="background:#fff;border:0;">[0 - 180]</span>
+                  </div>
+                  <div class="row">
+                    <span class="col-xs-12 text-center"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row" style="margin:20px 0">
+              <div class="col-sm-12">
+                <div id="keys" style="margin:0 auto;width:135; height:60px;position:relative">
+                  <button id="left" class="btn btn-primary" type="button" style="position:absolute;left:0;top:35px">
+                     <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+                  </button>
+                  <button id="up" class="btn btn-primary" type="button" style="position:absolute;left:45;top:3px">
+                     <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                  </button>
+                  <button id="down" class="btn btn-primary" type="button" style="position:absolute;left:45;top:35px">
+                     <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                  </button>
+                  <button id="right" class="btn btn-primary" type="button" style="position:absolute;left:90;top:35px">
+                     <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+         </div>
+      </div>
+    </div>
+    <div class="col-md-7 col-sm-12">
+      <div class="panel panel-default">
+          <div class="panel-heading text-center" >Identyfikacja osoby</div>
+            <div class="panel-body h-321 ">
+              <div ng-show="!isRecognized()" class="text-center">Nie rozpoznano żadnej osoby.</div>
+              <div ng-show="isRecognized()">
+                <h4 class="text-center" style="margin-bottom:30px"> Rozpoznano poniższa osobę </h4>
+                <div class="col-sm-6">
+                  <center><img src="{{recognized_person.main_photo}}" height="150px"></center>
+                </div>
+                <div class="col-sm-6">
+                  <div class="caption">
+                    <h3>{{recognized_person.firstname}} {{recognized_person.surname}}</h3>
+                    <p> <b>Ostanio widziany:</b> {{recognized_person.time}}</p>
+                    <p> <a ui-sref="viewWanted({id: recognized_person._id})" target="_blank" class="btn btn-default" role="button">Sczegóły</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading text-center">Konfiguracja</div>
+        <div class="panel-body">
+          <div class="col-md-6">
+            <form name="update_speed_form" novalidate class="form-horizontal" ng-submit="updateSpeed()">
+              <h3 class="config-header">Silnik</h3>
+              <div class="input-group input-group-sm" style="margin-top:20px;margin-bottom:20px">
+                <span class="input-group-addon" id="sizing-addon3">Lewy</span>
+                <input class="form-control" placeholder="predkość [0-100]" ng-pattern="/^([0-9]|[1-9][0-9]|100)$/" ng-model="robot.left_motor_speed" required>
+              </div>
+              <div class="input-group input-group-sm">
+                <span class="input-group-addon" id="sizing-addon3">Prawy</span>
+                <input  class="form-control" placeholder="predkość [0-100]" ng-pattern="/^([0-9]|[1-9][0-9]|100)$/" ng-model="robot.right_motor_speed" required>
+              </div>
+              <br>
+              <div class="alert alert-danger" ng-show="isSpeedError">
+                {{speed_error_msg}}
+              </div>
+              <div class="input-group input-group-sm pull-right" style="">
+                <input  type="submit" class="btn btn-primary " value="Ustaw">
+              </div>
+            </form>
+          </div> <!-- col first -->
+          <div class="col-md-6">
+            <form name="change_robot_mode" novalidate class="form-horizontal" ng-submit="changeRobotMode()">
+              <h3 class="config-header">Tryb</h3>
+              <br>
+              <div class="input-group input-group-sm" style="margin:0 auto">
+                 <label class="radio-inline"><input type="radio" name="robot_mode"   ng-model="robot_mode" value="auto">Auto</label>
+                 <label class="radio-inline"><input type="radio" name="robot_mode"   ng-model="robot_mode" value="manual">Manual</label>
+              </div>
+              <br>
+              <br>
+              <br>
+              <div class="input-group input-group-sm" style="margin:0 auto">
+                <input  type="submit" class="btn btn-primary " value="Ustaw">
+              </div>
+            </form>
+          </div> <!-- col second -->
+         </div> <!-- panel-body -->
+      </div> <!-- panel-default -->
+
+      <div class="panel panel-default">
+        <div class="panel-heading text-center">Odczyty czujników</div>
+        <div class="panel-body">
+          <div class="col-md-6">
+            <h3 class="config-header">Czujnik odległości</h3>
+            <div class="input-group input-group-sm" style="margin:25px auto;">
+             <label class="radio-inline"><input type="radio" name="distance_sensor" ng-model="distance_sensor" value="sonar">Sonar</label>
+             <label class="radio-inline"><input type="radio" name="distance_sensor" ng-model="distance_sensor" value="infrared">Podczerwień</label>
+            </div>
+            <div class="input-group input-group-sm">
+              <span class="input-group-addon" id="sizing-addon3">Odległość</span>
+              <div class="form-control" ng-show="isSonar()">{{getDistanceSensorSonar()}}</div>
+              <div class="form-control" ng-show="isInfrared()">{{getDistanceSensorInfrared()}}</div>
+            </div>
+          </div> <!-- col first -->
+          <div class="col-md-6">
+            <h3 class="config-header">Enkoder<h3>
+            <div class="input-group input-group-sm" style="margin-bottom:20px">
+              <span class="input-group-addon">Lewy</span>
+              <div class="form-control">{{getLeftEncoder()}}</div>
+            </div>
+            <div class="input-group input-group-sm">
+              <span class="input-group-addon">Prawy</span>
+              <div class="form-control">{{getRightEncoder()}}</div>
+            </div>
+          </div> <!-- col second -->
+        </div> <!-- panel-body -->
+      </div><!-- panel-default -->
+
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <p class="text-center"><a ui-sref="robots"> Wróć do listy robotów </a></p>
+    </div>
+  </div>
+</div>

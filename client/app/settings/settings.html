@@ -1,0 +1,45 @@
+<div class="container">
+  <div class="row">
+    <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3">
+      <form class="form-horizontal" name="form" ng-submit="changePassword(form)" novalidate>
+        <h2 class="text-center">Zmiana hasła</h2>
+        <div class="input-group pavubot-input-margin">
+          <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+          <input type="password" name="password" class="form-control" ng-model="user.oldPassword" placeholder="Obecne hasło"
+                 mongoose-error/>
+          <p class="help-block" ng-show="form.password.$error.mongoose">
+              {{ errors.other }}
+          </p>
+        </div>
+
+        <div class="input-group pavubot-input-margin">
+          <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+          <input type="password" name="newPassword" class="form-control" ng-model="user.newPassword" placeholder="Nowe hasło"
+                 ng-minlength="3"
+                 required/>
+          <p class="help-block"
+             ng-show="(form.newPassword.$error.minlength || form.newPassword.$error.required) && (form.newPassword.$dirty || submitted)">
+            Hasło musi mieć conajmniej 3 znaki długości.
+          </p>
+        </div>
+
+        <div class="input-group pavubot-input-margin">
+          <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+          <input type="password" name="confirmPassword" class="form-control" ng-model="user.confirmPassword" placeholder="Potwierdź hasło"
+                 match="user.newPassword"
+                 ng-minlength="3"
+                 required=""/>
+          <p class="help-block"
+             ng-show="form.confirmPassword.$error.match && submitted">
+            Podane hasła nie są identyczne.
+          </p>
+
+        </div>
+
+        <p class="help-block"> {{ message }} </p>
+
+        <button class="btn btn-lg btn-block btn-success" type="submit">Zmień hasło</button>
+      </form>
+    </div>
+  </div>
+</div>
