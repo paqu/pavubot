@@ -88,9 +88,13 @@ app.post('/api/wanted/', function (req,res) {
         }
     }
 
+    var date = new Date();
+    var day  = date.getDate() + '-' + date.getMonth() + 1 + '-' + date.getFullYear()
+    var time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+
     data.recognized_person_id = id;
-    data.time = req.body.date + "," + req.body.time;
-    video_nsp.in(chanel).emit("user:robot:face_recognize",data);
+    data.time = day + "," + time;
+    video_nsp.in(robots[0].video_socket_id).emit("user:robot:face_recognize",data);
 
     res.status(200).json({});
 });
